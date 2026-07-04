@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tripadvisor": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/index.js"],
+      "env": {
+        "TRIPADVISOR_API_KEY": "${TRIPADVISOR_API_KEY}",
+        "TRIPADVISOR_REFERER": "${TRIPADVISOR_REFERER}",
+        "TRIPADVISOR_CACHE_TTL": "${TRIPADVISOR_CACHE_TTL}",
+        "TRIPADVISOR_STATIC_CACHE_TTL": "${TRIPADVISOR_STATIC_CACHE_TTL}"
+      }
+    }
+  }
+}

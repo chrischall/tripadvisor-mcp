@@ -1,0 +1,81 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/dxt/main/dist/mcpb-manifest.schema.json",
+  "manifest_version": "0.3",
+  "name": "tripadvisor-mcp",
+  "display_name": "TripAdvisor",
+  "version": "0.0.0",
+  "description": "TripAdvisor location search, details, photos, and reviews for Claude via the official Content API",
+  "author": {
+    "name": "Chris Chall",
+    "email": "chris.c.hall@gmail.com",
+    "url": "https://github.com/chrischall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrischall/tripadvisor-mcp"
+  },
+  "homepage": "https://github.com/chrischall/tripadvisor-mcp",
+  "support": "https://github.com/chrischall/tripadvisor-mcp/issues",
+  "license": "MIT",
+  "keywords": [
+    "tripadvisor",
+    "travel",
+    "hotels",
+    "restaurants",
+    "attractions",
+    "reviews"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/bundle.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/bundle.js"
+      ],
+      "env": {
+        "TRIPADVISOR_API_KEY": "${user_config.tripadvisor_api_key}"
+      }
+    }
+  },
+  "user_config": {
+    "tripadvisor_api_key": {
+      "type": "string",
+      "title": "TripAdvisor Content API Key",
+      "description": "Your TripAdvisor Content API key (create one at tripadvisor.com/developers)",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    {
+      "name": "ta_search_locations",
+      "description": "Search TripAdvisor locations by name"
+    },
+    {
+      "name": "ta_search_nearby",
+      "description": "Find TripAdvisor locations near a lat/long"
+    },
+    {
+      "name": "ta_get_location_details",
+      "description": "Get details for a location (rating, address, hours, amenities)"
+    },
+    {
+      "name": "ta_get_location_photos",
+      "description": "Get photos for a location"
+    },
+    {
+      "name": "ta_get_location_reviews",
+      "description": "Get the most recent reviews for a location"
+    }
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
+    "runtimes": {
+      "node": ">=22.5"
+    }
+  }
+}
