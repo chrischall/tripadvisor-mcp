@@ -83,7 +83,11 @@ Non-2xx responses carry `{ "error": { "message": "...", "type": "...", "code": N
 Notable statuses:
 
 - `401` — key missing/invalid.
-- `403` — valid key blocked by its domain/IP restriction (or unapproved application).
+- `403` — key exists but is blocked. **Observed live 2026-07-03:** body is the AWS-gateway
+  message `{"Message":"User is not authorized to access this resource with an explicit deny
+  in an identity-based policy"}` (not the documented `{error:{...}}` shape) when the key has
+  no payment method attached or its IP restriction excludes the caller. Adding a `Referer`
+  does not change the outcome for key-level blocks — only for domain-restriction mismatches.
 - `429` — monthly quota or rate limit exceeded.
 
 ## Live verification status
