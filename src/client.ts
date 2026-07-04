@@ -137,10 +137,13 @@ export class TripAdvisorClient {
       });
     }
     if (res.status === 403) {
+      // Observed live: an unusable key answers 403 with the AWS-gateway body
+      // "User is not authorized … explicit deny in an identity-based policy" —
+      // that's key-level, and a Referer won't fix it.
       throw new McpToolError(
-        `${SERVICE} returned 403 Forbidden — the key is valid but blocked, usually by its domain/IP restriction (set at key creation) or an unapproved application.`,
+        `${SERVICE} returned 403 Forbidden — the key exists but is blocked: it has no payment method attached (TripAdvisor requires a card on file even for the free tier), or its IP restriction excludes this address, or its domain restriction needs a matching Referer.`,
         {
-          hint: 'If the key is domain-restricted, set TRIPADVISOR_REFERER to a matching https://domain; if IP-restricted, call from a listed address.',
+          hint: 'Check the key at https://www.tripadvisor.com/developers: attach billing, and either add this IP to the key or switch it to domain restriction and set TRIPADVISOR_REFERER to a matching https://domain.',
         },
       );
     }
