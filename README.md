@@ -34,6 +34,16 @@ Get a key at [tripadvisor.com/developers](https://www.tripadvisor.com/developers
 
 All tools are read-only — the Content API has no write endpoints.
 
+### Browser bridge (optional)
+
+`ta_web_healthcheck` is the first tool of an optional second tier that reaches
+tripadvisor.com's consumer site (bot-walled, so unreachable server-side) by
+routing same-origin fetches through your signed-in browser tab via the
+[fetchproxy](https://github.com/chrischall/fetchproxy) Transporter extension.
+It needs the extension installed and a one-time pairing approval; the Content
+API tools above never touch the bridge. Richer web-only data tools build on
+this foundation.
+
 ## Environment
 
 | Var | Required | Purpose |
