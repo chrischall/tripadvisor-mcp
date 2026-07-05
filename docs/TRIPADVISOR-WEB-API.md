@@ -18,6 +18,22 @@ Individual review **text** is rendered in HTML (no `Review` ld+json, no Apollo/r
 so scraping it is brittle and deliberately not built. The detail page's `aggregateRating`
 (rating + review count) IS clean and is returned.
 
+### Search — no key-free JSON endpoint (probed 2026-07-04)
+
+There is no clean consumer search/typeahead endpoint reachable through the bridge; every
+plausible one is a dead end, so **search is not built** (get a `d`-id from the Content API's
+`ta_search_locations`, or from a TripAdvisor URL, then use `ta_web_get_location`):
+
+| Endpoint | Result |
+| --- | --- |
+| `GET /TypeAheadJson?query=…` | 200 but empty body |
+| `GET /data/1.0/typeahead?query=…` | 404 |
+| `GET /api/internal/1.14/typeahead?query=…` | 401 (needs auth) |
+| `GET /Search?q=…` (+`searchType=json`) | 200 but the hydrated SPA shell (no result data) |
+
+Real search runs through `POST /data/graphql/ids` with a **persisted-query hash + variables**
+— the hash rotates, so it's brittle by design and off-limits per fleet discipline.
+
 ## Location detail — the one solid web endpoint
 
 **Canonicalization:** TripAdvisor canonicalizes on the **`d<id>`** segment. A single fixed
