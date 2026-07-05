@@ -4,7 +4,7 @@
   "name": "tripadvisor-mcp",
   "display_name": "TripAdvisor",
   "version": "0.0.0",
-  "description": "TripAdvisor location search, details, photos, and reviews for Claude via the official Content API",
+  "description": "TripAdvisor location search, details, photos, and reviews for Claude via the Terra API",
   "author": {
     "name": "Chris Chall",
     "email": "chris.c.hall@gmail.com",
@@ -41,8 +41,8 @@
   "user_config": {
     "tripadvisor_api_key": {
       "type": "string",
-      "title": "TripAdvisor Content API Key",
-      "description": "Your TripAdvisor Content API key (create one at tripadvisor.com/developers)",
+      "title": "TripAdvisor Terra API Key",
+      "description": "Your TripAdvisor Terra API key (create one at tripadvisor.com/developers)",
       "required": true,
       "sensitive": true
     }

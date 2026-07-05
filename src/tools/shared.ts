@@ -4,26 +4,24 @@ import { buildQueryString } from '@chrischall/mcp-utils';
 /** TripAdvisor location id — a positive integer (interpolated into the path). */
 export const LocationId = z.number().int().positive().describe('TripAdvisor location ID (from a search tool)');
 
-/** `"lat,long"` pair, e.g. `"42.3455,-71.10767"`. */
-export const LatLong = z
-  .string()
-  .regex(/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/, 'must be a "lat,long" pair like "42.3455,-71.10767"');
+/** Terra category filter — the three UPPERCASE values the API accepts. */
+export const Category = z.enum(['RESTAURANT', 'ATTRACTION', 'HOTEL']);
 
-/** Search category filter — the four values the Content API accepts. */
-export const Category = z.enum(['hotels', 'attractions', 'restaurants', 'geos']);
+/** Locale list → Terra's repeated `locale` query param. */
+export const LocaleList = z
+  .array(z.string())
+  .optional()
+  .describe('Preferred locales for localized fields, in priority order (e.g. ["en","es"])');
 
-/** Filters shared by the two search endpoints. */
-export const searchFilterParams = {
-  category: Category.optional().describe('Restrict results to one property type'),
-  phone: z.string().optional().describe('Phone number filter (spaces/dashes ok, no leading "+")'),
-  address: z.string().optional().describe('Address filter'),
-  radius: z.number().positive().optional().describe('Search radius around latLong (must be > 0)'),
-  radiusUnit: z.enum(['km', 'mi', 'm']).optional().describe('Unit for radius'),
-  language: z.string().optional().describe('Result language code (default: en)'),
+/** Paging shared by Terra list endpoints (size is capped at 20 by the API). */
+export const pageParams = {
+  page: z.number().int().min(1).optional().describe('Page index (1-based)'),
+  size: z.number().int().min(1).max(20).optional().describe('Results per page (max 20)'),
 };
 
 /**
- * Build a `?a=b&c=d` query string, dropping undefined values. Thin wrapper over
+ * Build a `?a=b&c=d` query string, dropping undefined values and expanding
+ * arrays into repeated params (Terra takes `locale` repeated). Thin wrapper over
  * the shared helper so every tool serializes params identically.
  */
 export function qs(params: Record<string, unknown>): string {

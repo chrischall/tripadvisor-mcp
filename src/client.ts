@@ -1,16 +1,16 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadDotenvSafely, readEnvVar, formatApiError, McpToolError } from '@chrischall/mcp-utils';
+import { loadDotenvSafely, readEnvVar, formatApiError, truncateErrorMessage, McpToolError } from '@chrischall/mcp-utils';
 
 // Load .env for local dev; silently skip if dotenv is unavailable (e.g. the
 // .mcpb bundle). loadDotenvSafely never lets .env override a host-provided value.
 const __dirname = dirname(fileURLToPath(import.meta.url));
 await loadDotenvSafely({ path: join(__dirname, '..', '.env'), override: false });
 
-const BASE_URL = 'https://api.content.tripadvisor.com/api/v1';
-const SERVICE = 'TripAdvisor Content API';
+const BASE_URL = 'https://terra.tripadvisor.com/api';
+const SERVICE = 'TripAdvisor Terra API';
 const REQUEST_TIMEOUT_MS = 30_000;
-// The Content API free tier is 5,000 calls/month, so identical GETs in quick
+// The Terra Discover tier is 10,000 calls/day, so identical GETs in quick
 // succession are wasteful. Search results get a 5-minute TTL by default;
 // override with TRIPADVISOR_CACHE_TTL (seconds; 0 = off).
 const DEFAULT_CACHE_TTL_MS = 300_000;
@@ -35,7 +35,6 @@ function readCacheTtlMs(envVar: string, defaultMs: number): number {
 export class TripAdvisorClient {
   private readonly apiKey: string | null;
   private readonly configError: Error | null;
-  private readonly referer: string | undefined;
   private readonly fetchImpl: typeof fetch;
   private readonly sleep: (ms: number) => Promise<void>;
   private readonly cacheTtlMs: number;
@@ -63,12 +62,11 @@ export class TripAdvisorClient {
     this.staticCacheTtlMs =
       opts.staticCacheTtlMs ?? readCacheTtlMs('TRIPADVISOR_STATIC_CACHE_TTL', DEFAULT_STATIC_CACHE_TTL_MS);
     this.fetchImpl = opts.fetchImpl ?? fetch;
-    this.referer = readEnvVar('TRIPADVISOR_REFERER');
     const key = readEnvVar('TRIPADVISOR_API_KEY');
     if (!key) {
       this.apiKey = null;
       this.configError = new McpToolError('TRIPADVISOR_API_KEY environment variable is required', {
-        hint: 'Create a Content API key at https://www.tripadvisor.com/developers and set TRIPADVISOR_API_KEY in your MCP host env or .env (free tier: 5,000 calls/month).',
+        hint: 'Create a Terra API key at https://www.tripadvisor.com/developers and set TRIPADVISOR_API_KEY in your MCP host env or .env (free Discover tier: 10,000 calls/day).',
       });
     } else {
       this.apiKey = key;
@@ -115,12 +113,10 @@ export class TripAdvisorClient {
 
   private async request<T>(path: string, isRetry = false): Promise<T> {
     const key = this.requireKey();
-    const sep = path.includes('?') ? '&' : '?';
-    const url = `${BASE_URL}${path}${sep}key=${encodeURIComponent(key)}`;
-    const headers: Record<string, string> = { Accept: 'application/json' };
-    // A domain-restricted key requires a matching Referer on every request.
-    if (this.referer) headers.Referer = this.referer;
-    const res = await this.fetchImpl(url, { headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+    // Terra authenticates with the X-API-Key header (not a query param), so the
+    // key never touches the URL — cache keys and error messages are key-free.
+    const headers: Record<string, string> = { 'X-API-Key': key, Accept: 'application/json' };
+    const res = await this.fetchImpl(`${BASE_URL}${path}`, { headers, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
     if (res.ok) return (await res.json()) as T;
 
     const text = await res.text();
@@ -130,26 +126,21 @@ export class TripAdvisorClient {
       await this.sleep(delayMs);
       return this.request<T>(path, true);
     }
-    // `path` deliberately excludes the key, so these messages can't leak it.
-    if (res.status === 401) {
-      throw new McpToolError(`${SERVICE} returned 401 Unauthorized — TRIPADVISOR_API_KEY is missing or invalid.`, {
-        hint: 'Check the key in your MCP host env or .env; create one at https://www.tripadvisor.com/developers',
-      });
-    }
-    if (res.status === 403) {
-      // Observed live: an unusable key answers 403 with the AWS-gateway body
-      // "User is not authorized … explicit deny in an identity-based policy" —
-      // that's key-level, and a Referer won't fix it.
+    if (res.status === 401 || res.status === 403) {
       throw new McpToolError(
-        `${SERVICE} returned 403 Forbidden — the key exists but is blocked: it has no payment method attached (TripAdvisor requires a card on file even for the free tier), or its IP restriction excludes this address, or its domain restriction needs a matching Referer.`,
-        {
-          hint: 'Check the key at https://www.tripadvisor.com/developers: attach billing, and either add this IP to the key or switch it to domain restriction and set TRIPADVISOR_REFERER to a matching https://domain.',
-        },
+        `${SERVICE} returned ${res.status} — TRIPADVISOR_API_KEY is missing, invalid, or not authorized for Terra. A legacy Content API key does NOT work here (and a Terra key does not work on the legacy endpoint).`,
+        { hint: 'Confirm the key on the Terra dashboard at https://www.tripadvisor.com/developers and that its plan is active.' },
       );
     }
     if (res.status === 429) {
-      throw new McpToolError(`${SERVICE} rate limit or monthly quota exceeded (429).`, {
-        hint: 'The free tier is 5,000 calls/month — check usage at https://www.tripadvisor.com/developers. Cached reads (TRIPADVISOR_CACHE_TTL) stretch the quota.',
+      throw new McpToolError(`${SERVICE} rate limit or daily quota exceeded (429).`, {
+        hint: 'The Discover tier allows 10 QPS and 10,000 calls/day — check usage at https://www.tripadvisor.com/developers. Cached reads (TRIPADVISOR_CACHE_TTL) stretch the quota.',
+      });
+    }
+    if (res.status === 400) {
+      // Terra 400s carry a structured validation body; surface it (it names the bad field).
+      throw new McpToolError(`${SERVICE} rejected the request (400): ${truncateErrorMessage(text)}`, {
+        hint: 'Check the parameters against docs/TRIPADVISOR-API.md (e.g. category must be RESTAURANT/ATTRACTION/HOTEL; nearby needs lat+lon+radius or a bounding box).',
       });
     }
     throw new McpToolError(formatApiError(res.status, 'GET', path, text, { service: SERVICE }));

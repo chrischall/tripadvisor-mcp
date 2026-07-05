@@ -7,7 +7,7 @@
 // regardless of cookie freshness. So web-tier requests run through the
 // fetchproxy bridge: each one is a same-origin fetch executed in the user's
 // open tripadvisor.com tab, and the bot wall never sees Node. The official
-// Content API tools (src/client.ts) are unaffected — they never touch the
+// Terra API tools (src/client.ts) are unaffected — they never touch the
 // bridge.
 //
 // This is the fleet's fetchproxy archetype (alltrails/redfin/zillow): a thin
