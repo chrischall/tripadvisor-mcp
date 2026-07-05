@@ -32,6 +32,7 @@ Get a key at [tripadvisor.com/developers](https://www.tripadvisor.com/developers
 | `ta_get_location_photos` | Photos with multi-size image URLs, captions, and source filter |
 | `ta_get_location_reviews` | Most recent reviews (up to 5 per call, pageable with `offset`) |
 | `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (see below) |
+| `ta_web_get_location` | Location details (rating, address, coords, phone, photo) read from the public page via the browser bridge — **no API key needed** |
 
 All tools are read-only — the Content API has no write endpoints.
 
@@ -42,8 +43,14 @@ tripadvisor.com's consumer site (bot-walled, so unreachable server-side) by
 routing same-origin fetches through your signed-in browser tab via the
 [fetchproxy](https://github.com/chrischall/fetchproxy) Transporter extension.
 It needs the extension installed and a one-time pairing approval; the Content
-API tools above never touch the bridge. Richer web-only data tools build on
-this foundation.
+API tools above never touch the bridge.
+
+`ta_web_get_location` uses this bridge to read a location's details straight
+from its public TripAdvisor page — so it works **without a Content API key**,
+covering attractions, hotels, and restaurants. It returns core business data
+(rating, review count, address, coordinates, phone, primary photo, listing
+URL) but not individual review text. Request shapes are pinned in
+[docs/TRIPADVISOR-WEB-API.md](docs/TRIPADVISOR-WEB-API.md).
 
 ## Environment
 

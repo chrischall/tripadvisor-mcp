@@ -18,6 +18,7 @@ describe('tool roster', () => {
       'ta_get_location_reviews',
       'ta_search_locations',
       'ta_search_nearby',
+      'ta_web_get_location',
       'ta_web_healthcheck',
     ]);
     await h.close();

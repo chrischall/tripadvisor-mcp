@@ -8,9 +8,11 @@ Guidance for Claude working in this repo.
 The primary tier wraps the official read-only REST API
 (`https://api.content.tripadvisor.com/api/v1`) and exposes 5 tools to Claude
 over stdio: location search, nearby search, location details, photos, and
-reviews. A second tier reaches the bot-walled consumer site via fetchproxy;
-today it ships only `ta_web_healthcheck`, with the `ta_web_*` data tools
-pending live capture.
+reviews. A second tier reaches the bot-walled consumer site via fetchproxy:
+`ta_web_healthcheck` (bridge diagnostics) and `ta_web_get_location` (location
+details parsed from the public page's schema.org ld+json — works with no API
+key, covering attractions/hotels/restaurants). Web-tier shapes are pinned in
+`docs/TRIPADVISOR-WEB-API.md`.
 
 Auth for the primary tier is a Content API key (`TRIPADVISOR_API_KEY`) sent as
 the **`key` query parameter** — not a header — so this is the direct-API
@@ -61,9 +63,11 @@ so the host's install-time `tools/list` probe still succeeds.
 - `src/tools/search.ts` — `ta_search_locations`, `ta_search_nearby`.
 - `src/tools/location.ts` — `ta_get_location_details`, `ta_get_location_photos`,
   `ta_get_location_reviews`.
-- `src/tools/web.ts` — `ta_web_healthcheck` (via `registerBridgeHealthcheckTool`).
+- `src/tools/web.ts` — `ta_web_healthcheck`, `ta_web_get_location`.
 - `src/web/{transport,client,config}.ts` — the fetchproxy bridge tier
   (transport on port 37149, generic web client with bot-wall guards, config).
+- `src/web/parse.ts` — pure ld+json → `LocationDetail` projection (unit-tested
+  against captured bytes; the business node is the one with name+aggregateRating).
 - `src/index.ts` — wires the registrars via `runMcp`; version from
   `src/version.ts` (single release-please-managed source).
 - `docs/TRIPADVISOR-API.md` — pinned request shapes from the official reference.
