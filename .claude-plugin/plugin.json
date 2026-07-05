@@ -1,7 +1,7 @@
 {
   "name": "tripadvisor-mcp",
   "displayName": "TripAdvisor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "MCP server for the TripAdvisor Terra API — location search, details, photos, and reviews",
   "author": {
     "name": "Chris Hall",
