@@ -38,6 +38,15 @@ https://terra.tripadvisor.com/api
 Center is **`lat`+`lon`+`radius`** (`unit` = `MI` default \| `KM`) **or** a bounding box
 (`sw_lat`,`sw_lon`,`ne_lat`,`ne_lon`) **or** `location_id`+`radius`. Plus `category`,
 `min_rating` (1.0–5.0), `include_photo` (bool), `sort` (`distance`\|`rating`), `page`, `size`, `locale`.
+All three center modes verified live (2026-07-05). The bounding-box mode ignores `radius`.
+
+### 2b. Multiple Locations (batch) — `GET /locations`
+
+Repeated **`id`** query param (`?id=1&id=2&…`), required. Optional `locale[]`. Returns
+`{ data: [ <Location>, … ] }` — **no `pagination` wrapper**. Verified live: `id=323690&id=348876`
+returned both. IDs you're not licensed for, or that don't exist, are **silently omitted** rather
+than failing the request (a malformed id — e.g. one exceeding int32 — does 400, though). Saves
+quota vs. N single `/locations/{id}` calls.
 
 ### 3. Location Details — `GET /locations/{id}`
 

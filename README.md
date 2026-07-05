@@ -26,9 +26,10 @@ Get a key at [tripadvisor.com/developers](https://www.tripadvisor.com/developers
 
 | Tool | What it does |
 | --- | --- |
-| `ta_search_locations` | Search locations by name (optionally scoped by category, country/geo/postal code) — paginated |
-| `ta_search_nearby` | Find locations near a lat/lon within a radius (category, min rating, sort) — paginated |
+| `ta_search_locations` | Search locations by name (optionally scoped by category, country/geo/postal code) — paginated; `compact:true` for slim summaries |
+| `ta_search_nearby` | Find locations near a lat/lon+radius, a `location_id`+radius, or inside a sw/ne bounding box (category, min rating, sort) — `compact:true` supported |
 | `ta_get_location_details` | Full details: names, descriptions, address, coordinates, traveler ratings, phone, listing URLs |
+| `ta_get_locations` | Batch — details for **multiple** location ids in one call (cheaper than N detail calls); `compact:true` supported |
 | `ta_get_location_photos` | Photos with multi-size image URLs, source, and dimensions — paginated |
 | `ta_get_location_reviews` | Traveler reviews — paginated |
 | `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (see below) |

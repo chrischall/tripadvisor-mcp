@@ -17,6 +17,29 @@ describe('location tools (Terra)', () => {
     harness = await createTestHarness((server) => registerLocationTools(server));
   });
 
+  describe('ta_get_locations (batch)', () => {
+    it('calls /locations with repeated id params', async () => {
+      await harness.callTool('ta_get_locations', { ids: [1, 2, 3] });
+      expect(mockGet).toHaveBeenCalledWith('/locations?id=1&id=2&id=3', { cache: 'static' });
+    });
+
+    it('projects to compact when requested', async () => {
+      mockGet.mockResolvedValueOnce({
+        data: [{ id: 1, names: [{ value: 'A', primary: true }], traveler_ratings: { overall: { rating: 4, count: 2 } } }],
+      });
+      const result = await harness.callTool('ta_get_locations', { ids: [1], compact: true });
+      const text = (result.content[0] as { text: string }).text;
+      expect(text).toContain('"name": "A"');
+      expect(text).toContain('"rating": 4');
+      expect(text).not.toContain('traveler_ratings');
+    });
+
+    it('rejects an empty id list', async () => {
+      expect((await harness.callTool('ta_get_locations', { ids: [] })).isError).toBe(true);
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+  });
+
   describe('ta_get_location_details', () => {
     it('calls /locations/{id} on the static cache tier', async () => {
       await harness.callTool('ta_get_location_details', { locationId: 89575 });

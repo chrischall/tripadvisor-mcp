@@ -49,6 +49,18 @@ describe('search tools (Terra)', () => {
       expect((await harness.callTool('ta_search_locations', { query: 'x', size: 50 })).isError).toBe(true);
       expect(mockGet).not.toHaveBeenCalled();
     });
+
+    it('projects to compact when requested', async () => {
+      mockGet.mockResolvedValueOnce({
+        data: [{ location: { id: 7, names: [{ value: 'Z', primary: true }] }, matched_value: { value: 'Z' } }],
+        pagination: { page: 1 },
+      });
+      const result = await harness.callTool('ta_search_locations', { query: 'z', compact: true });
+      const text = (result.content[0] as { text: string }).text;
+      expect(text).toContain('"id": 7');
+      expect(text).toContain('"name": "Z"');
+      expect(text).not.toContain('matched_value');
+    });
   });
 
   describe('ta_search_nearby', () => {
@@ -63,8 +75,33 @@ describe('search tools (Terra)', () => {
       expect(mockGet.mock.calls[0][1]).toEqual({ cache: 'dynamic' });
     });
 
-    it('requires lat, lon, and radius', async () => {
+    it('accepts a bounding box (no radius)', async () => {
+      await harness.callTool('ta_search_nearby', { sw_lat: 37.8, sw_lon: -122.5, ne_lat: 37.83, ne_lon: -122.45 });
+      const path = mockGet.mock.calls[0][0] as string;
+      expect(path).toContain('sw_lat=37.8');
+      expect(path).toContain('ne_lon=-122.45');
+      expect(path).not.toContain('radius');
+    });
+
+    it('accepts a location_id center with radius', async () => {
+      await harness.callTool('ta_search_nearby', { location_id: 104675, radius: 3 });
+      expect(mockGet.mock.calls[0][0]).toContain('location_id=104675');
+      expect(mockGet.mock.calls[0][0]).toContain('radius=3');
+    });
+
+    it('rejects zero or multiple center modes', async () => {
+      // none
+      expect((await harness.callTool('ta_search_nearby', { radius: 5 })).isError).toBe(true);
+      // two (lat/lon AND location_id)
+      expect(
+        (await harness.callTool('ta_search_nearby', { lat: 1, lon: 2, location_id: 3, radius: 5 })).isError,
+      ).toBe(true);
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+
+    it('requires radius for lat/lon and location_id modes', async () => {
       expect((await harness.callTool('ta_search_nearby', { lat: 42.3, lon: -71.1 })).isError).toBe(true);
+      expect((await harness.callTool('ta_search_nearby', { location_id: 5 })).isError).toBe(true);
       expect(mockGet).not.toHaveBeenCalled();
     });
 

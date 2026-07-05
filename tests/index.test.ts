@@ -16,6 +16,7 @@ describe('tool roster', () => {
       'ta_get_location_details',
       'ta_get_location_photos',
       'ta_get_location_reviews',
+      'ta_get_locations',
       'ta_search_locations',
       'ta_search_nearby',
       'ta_web_get_location',
