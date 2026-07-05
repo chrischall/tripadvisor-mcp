@@ -23,7 +23,7 @@ Add to `.mcp.json` in your project or `~/.claude/mcp.json`:
       "command": "npx",
       "args": ["-y", "@chrischall/tripadvisor-mcp"],
       "env": {
-        "TRIPADVISOR_API_KEY": "your-content-api-key-here"
+        "TRIPADVISOR_API_KEY": "your-terra-api-key-here"
       }
     }
   }

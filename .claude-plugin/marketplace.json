@@ -6,7 +6,7 @@
     "email": "chris.c.hall@gmail.com"
   },
   "metadata": {
-    "description": "MCP server for the TripAdvisor Content API — location search, details, photos, and reviews",
+    "description": "MCP server for the TripAdvisor Terra API — location search, details, photos, and reviews",
     "version": "0.0.0"
   },
   "plugins": [
@@ -14,7 +14,7 @@
       "name": "tripadvisor-mcp",
       "displayName": "TripAdvisor",
       "source": "./",
-      "description": "TripAdvisor travel data via the official Content API — search hotels, restaurants, and attractions, with details, photos, and reviews",
+      "description": "TripAdvisor travel data via the Terra API — search hotels, restaurants, and attractions, with details, photos, and reviews",
       "version": "0.0.0",
       "author": {
         "name": "Chris Hall"

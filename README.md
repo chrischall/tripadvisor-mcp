@@ -14,7 +14,7 @@ MCP server for the **TripAdvisor Terra API** — travel data for Claude. Search 
     "tripadvisor": {
       "command": "npx",
       "args": ["-y", "@chrischall/tripadvisor-mcp"],
-      "env": { "TRIPADVISOR_API_KEY": "your-content-api-key-here" }
+      "env": { "TRIPADVISOR_API_KEY": "your-terra-api-key-here" }
     }
   }
 }

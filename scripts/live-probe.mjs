@@ -4,8 +4,11 @@
 // Needs TRIPADVISOR_API_KEY (a Terra key) in .env; calls are spaced to stay
 // polite on the Discover tier (10 QPS / 10k per day).
 // Usage: node scripts/live-probe.mjs
-import { client } from '../dist/client.js';
+import { TripAdvisorClient } from '../dist/client.js';
 
+// A fresh client with caching OFF, so every run genuinely hits Terra (the shared
+// singleton would honor env-configured TTLs and could serve stale cached JSON).
+const client = new TripAdvisorClient({ cacheTtlMs: 0, staticCacheTtlMs: 0 });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const primaryName = (loc) => (loc?.names || []).find((n) => n.primary)?.value || loc?.names?.[0]?.value;
 const preview = (label, data) => {
