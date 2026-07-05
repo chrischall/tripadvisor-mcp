@@ -58,6 +58,7 @@ npm install && npm run build
 | `ta_get_location_details` | Full listing for a `location_id`: rating, ranking, subratings, awards, review count, amenities, hours, URLs. Optional `language`, `currency`. |
 | `ta_get_location_photos` | Photos (multi-size URLs + captions). Page with `limit`/`offset`; filter `source` to `Expert`, `Management`, `Traveler`. |
 | `ta_get_location_reviews` | Up to 5 most-recent reviews per call; page with `offset`. |
+| `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (fetchproxy Transporter). Reports bridge role/port/timing and an actionable hint if it's not connected. |
 
 ## Workflow
 
