@@ -36,7 +36,7 @@ export function registerWebTools(server: McpServer): void {
     'ta_web_get_location',
     {
       description:
-        "Get a TripAdvisor location's core details (name, rating, review count, address, coordinates, phone, photo, listing URL) by location ID, read from the public page via the browser bridge. Works without a Content API key — use this when ta_get_location_details is unavailable or its key is blocked. Covers attractions, hotels, and restaurants. Does not return individual review text.",
+        "Get a TripAdvisor location's core details (name, rating, review count, address, coordinates, phone, photo, listing URL) by location ID, read from the public page via the browser bridge. Works without an API key — use this when ta_get_location_details is unavailable or its key is blocked. Covers attractions, hotels, and restaurants. Does not return individual review text.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {
         locationId: LocationId,

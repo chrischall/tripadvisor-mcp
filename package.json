@@ -2,7 +2,7 @@
   "name": "@chrischall/tripadvisor-mcp",
   "version": "0.0.0",
   "mcpName": "io.github.chrischall/tripadvisor-mcp",
-  "description": "TripAdvisor Content API MCP server for Claude \u2014 search locations, details, photos, and reviews. Developed and maintained by AI (Claude Code).",
+  "description": "TripAdvisor Terra API MCP server for Claude \u2014 search locations, details, photos, and reviews. Developed and maintained by AI (Claude Code).",
   "author": "Claude Code (AI) <https://www.anthropic.com/claude>",
   "repository": {
     "type": "git",

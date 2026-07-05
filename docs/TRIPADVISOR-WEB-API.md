@@ -21,7 +21,7 @@ so scraping it is brittle and deliberately not built. The detail page's `aggrega
 ### Search — no key-free JSON endpoint (probed 2026-07-04)
 
 There is no clean consumer search/typeahead endpoint reachable through the bridge; every
-plausible one is a dead end, so **search is not built** (get a `d`-id from the Content API's
+plausible one is a dead end, so **search is not built** (get a `d`-id from the Terra API's
 `ta_search_locations`, or from a TripAdvisor URL, then use `ta_web_get_location`):
 
 | Endpoint | Result |

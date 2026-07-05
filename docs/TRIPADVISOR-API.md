@@ -1,98 +1,92 @@
-# TripAdvisor Content API — pinned request shapes
+# TripAdvisor Terra API — pinned request shapes
 
-Pinned from the official reference (https://tripadvisor-content-api.readme.io/reference/overview)
-on 2026-07-03. The Content API is **read-only** (no write endpoints). All requests are
-`GET` over https against:
+The MCP targets TripAdvisor's **Terra** API (the successor to the legacy Content API, which is
+sunset on 2026-08-31). Shapes below were captured live with a real Discover-plan key on
+2026-07-05. All requests are `GET` over https against:
 
 ```
-https://api.content.tripadvisor.com/api/v1
+https://terra.tripadvisor.com/api
 ```
 
 ## Authentication
 
-- API key in the **`key` query parameter** (not a header).
-- Keys are created at https://www.tripadvisor.com/developers and may be **restricted by
-  domain or IP** at creation time. A domain-restricted key requires a matching `Referer`
-  header on every request (`TRIPADVISOR_REFERER` in this repo); an IP-restricted key must
-  be called from a listed address. A mismatch returns `403`.
-- Free tier: 5,000 calls/month; hard rate limits apply beyond that (429 / 403 on abuse).
+- API key in the **`X-API-Key` request header** (the legacy `key` query param is gone).
+- Keys are created at https://www.tripadvisor.com/developers (the Terra dashboard). A key must
+  have an active plan; the free **Discover** tier is pay-as-you-go (10 QPS, 10,000 calls/day).
+- Calling the **legacy** endpoint (`api.content.tripadvisor.com/api/v1`) with a Terra key returns
+  `403` with an AWS-gateway body `{"Message":"User is not authorized … explicit deny …"}`. That
+  is the tell that a key is Terra, not legacy.
 
 ## Endpoints
 
-### 1. Location Search — `GET /location/search`
+### 1. Location Search — `GET /locations/search`
 
 | Param | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `key` | string | yes | Partner API key |
-| `searchQuery` | string | yes | Free-text name search |
-| `category` | string | no | `hotels` \| `attractions` \| `restaurants` \| `geos` |
-| `phone` | string | no | Digits with optional spaces/dashes, no leading `+` |
-| `address` | string | no | Address filter |
-| `latLong` | string | no | `"42.3455,-71.10767"` |
-| `radius` | number | no | > 0; scopes `latLong` |
-| `radiusUnit` | string | no | `km` \| `mi` \| `m` |
-| `language` | string | no | Default `en` (45 codes incl. regional variants) |
+| `query` | string | yes | 1–500 chars |
+| `category` | string | no | `RESTAURANT` \| `ATTRACTION` \| `HOTEL` (UPPERCASE) |
+| `search_type` | string | no | Default `NAME` |
+| `country_code` | string | no | Alpha-2 (e.g. `US`) |
+| `geo_name` | string | no | City/Town/Country name |
+| `postal_code` | string | no | Takes precedence over `geo_name` |
+| `locale` | string[] | no | Priority-ordered locales for localized fields |
+| `page` | integer | no | 1-based |
+| `size` | integer | no | Default 20, **max 20** |
 
-Returns up to **10** locations: `{ data: [{ location_id, name, address_obj, ... }] }`.
+### 2. Nearby Search — `GET /locations/nearby`
 
-### 2. Nearby Search — `GET /location/nearby_search`
+Center is **`lat`+`lon`+`radius`** (`unit` = `MI` default \| `KM`) **or** a bounding box
+(`sw_lat`,`sw_lon`,`ne_lat`,`ne_lon`) **or** `location_id`+`radius`. Plus `category`,
+`min_rating` (1.0–5.0), `include_photo` (bool), `sort` (`distance`\|`rating`), `page`, `size`, `locale`.
 
-Same params as search except `latLong` is **required** and there is no `searchQuery`.
-Returns up to **10** locations near the point.
+### 3. Location Details — `GET /locations/{id}`
 
-### 3. Location Details — `GET /location/{locationId}/details`
+Path `id` (int) — **plural `/locations/{id}`** (the docs' llms.txt index says singular; that 404s).
+Optional `locale[]`. Returns the full location object directly (not wrapped in `data`).
 
-| Param | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `locationId` | int32 | yes (path) | From Location Search |
-| `key` | string | yes | |
-| `language` | string | no | Default `en` |
-| `currency` | string | no | ISO 4217, default `USD` |
+### 4. Location Reviews — `GET /locations/{id}/reviews`
 
-Returns name, address, coordinates, rating, ranking, subratings, awards, review count,
-amenities, hours, and Tripadvisor listing/write-review URLs.
+Optional `page`, `size` (max 20), `locale[]`. Returns `{ data: [...], pagination }`.
 
-### 4. Location Photos — `GET /location/{locationId}/photos`
+### 5. Location Photos — `GET /locations/{id}/photos`
 
-| Param | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `locationId` | int32 | yes (path) | |
-| `key` | string | yes | |
-| `language` | string | no | Default `en` |
-| `limit` | number | no | Number of results |
-| `offset` | number | no | Index of first result |
-| `source` | string | no | Comma-separated: `Expert`, `Management`, `Traveler` |
+Optional `page`, `size` (max 20), `locale[]`. Returns `{ data: [...], pagination }`.
 
-Returns photo objects with multi-size image URLs (`{ data: [{ id, caption, images: { thumbnail|small|medium|large|original: { url, ... } } }] }`).
+## Response shapes
 
-### 5. Location Reviews — `GET /location/{locationId}/reviews`
+**List endpoints** (`search`, `nearby`, `reviews`, `photos`) wrap results:
 
-| Param | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `locationId` | int32 | yes (path) | |
-| `key` | string | yes | |
-| `language` | string | no | Default `en` |
-| `limit` | number | no | |
-| `offset` | number | no | |
+```jsonc
+{ "data": [ /* items */ ], "pagination": { "page": 1, "size": 20, "total_pages": N, "total_elements": M } }
+```
 
-Returns up to **5 of the most recent** reviews per call.
+- `search` item: `{ location: <Location>, matched_value: { language, value } }`
+- `nearby` item: `{ location: <Location>, bearing, distance_miles, distance_kilometers }`
+- `photos` item: `{ id, location_id, photo: { key, original_size_url, original_height, original_width, media_type }, publish_ts, source: { name }, user }`
+
+**Location** object (also the `details` response, unwrapped):
+
+```jsonc
+{
+  "id": 104675, "geo_id": 60713, "geo": "San Francisco, California",
+  "names": [{ "language": "en", "value": "Golden Gate Bridge", "primary": true }],
+  "status": { "value": "..." },
+  "descriptions": [{ "language": "en", "value": "..." }],
+  "coordinates": { "latitude": 37.82, "longitude": -122.4786 },   // present on search/nearby items
+  "addresses": [{ "street_address", "city", "state", "country_name", "country_code", "postal_code", "formatted" }],
+  "phone_numbers": [{ "value", "type" }],
+  "urls": { "tripadvisor": { "main", "photos", "write_review", "questions_answers" }, "official": "..." },
+  "traveler_ratings": { "overall": { "rating": 4.7, "count": 49969, "icon_url": "..." }, "breakdowns": [], "subratings": [] },
+  "official_email": "...", "recommended_visit_length": N
+}
+```
+
+Note: `names` is an **array** keyed by language (not a flat `name`) — the primary name is the
+entry with `primary: true` (or the first). Same for `descriptions`/`addresses`.
 
 ## Error shape
 
-Non-2xx responses carry `{ "error": { "message": "...", "type": "...", "code": NNN } }`.
-Notable statuses:
-
-- `401` — key missing/invalid.
-- `403` — key exists but is blocked. **Observed live 2026-07-03:** body is the AWS-gateway
-  message `{"Message":"User is not authorized to access this resource with an explicit deny
-  in an identity-based policy"}` (not the documented `{error:{...}}` shape) when the key has
-  no payment method attached or its IP restriction excludes the caller. Adding a `Referer`
-  does not change the outcome for key-level blocks — only for domain-restriction mismatches.
-- `429` — monthly quota or rate limit exceeded.
-
-## Live verification status
-
-Request shapes above are pinned from the official reference docs. **Live verification is
-gated on a human-supplied `TRIPADVISOR_API_KEY`** (the key form requires a billing-capable
-TripAdvisor account); run `node scripts/live-probe.mjs` once a key is in `.env` and update
-this section with any observed response-shape drift.
+- `400` — validation: `{ type, title, status, detail, field_errors: [{ field, message, ... }], trace_id }`.
+- `401`/`403` — key missing/invalid or not authorized (e.g. a legacy key on Terra, or vice-versa).
+- `404` — `{ "message": "Not Found" }` (unknown id, or the wrong singular `/location/{id}` path).
+- `429` — plan QPS or daily quota exceeded (Discover: 10 QPS, 10k/day).

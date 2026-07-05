@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@chrischall/tripadvisor-mcp)](https://www.npmjs.com/package/@chrischall/tripadvisor-mcp)
 
-MCP server for the **TripAdvisor Content API** — travel data for Claude. Search hotels, restaurants, attractions, and destinations by name or coordinates, then pull full details, photos, and recent reviews, all over stdio.
+MCP server for the **TripAdvisor Terra API** — travel data for Claude. Search hotels, restaurants, and attractions by name or coordinates, then pull full details, photos, and reviews, all over stdio. (Terra is TripAdvisor's current API; the legacy Content API is sunset on 2026-08-31.)
 
 > Developed and maintained by AI (Claude Code). Use at your own discretion.
 
@@ -20,21 +20,21 @@ MCP server for the **TripAdvisor Content API** — travel data for Claude. Searc
 }
 ```
 
-Get a key at [tripadvisor.com/developers](https://www.tripadvisor.com/developers). The free tier is **5,000 calls/month**; responses are cached in-memory to stretch it.
+Get a key at [tripadvisor.com/developers](https://www.tripadvisor.com/developers). The free **Discover** tier is pay-as-you-go (10 QPS, **10,000 calls/day**); responses are cached in-memory to stretch it. Make sure it's a **Terra** key — a legacy Content API key returns 403.
 
 ## Tools
 
 | Tool | What it does |
 | --- | --- |
-| `ta_search_locations` | Search locations by name (optionally scoped by category, lat/long + radius, address, phone) — up to 10 matches |
-| `ta_search_nearby` | Find locations near a latitude/longitude — up to 10 matches |
-| `ta_get_location_details` | Full details: rating, ranking, subratings, awards, review count, amenities, hours, listing URLs |
-| `ta_get_location_photos` | Photos with multi-size image URLs, captions, and source filter |
-| `ta_get_location_reviews` | Most recent reviews (up to 5 per call, pageable with `offset`) |
+| `ta_search_locations` | Search locations by name (optionally scoped by category, country/geo/postal code) — paginated |
+| `ta_search_nearby` | Find locations near a lat/lon within a radius (category, min rating, sort) — paginated |
+| `ta_get_location_details` | Full details: names, descriptions, address, coordinates, traveler ratings, phone, listing URLs |
+| `ta_get_location_photos` | Photos with multi-size image URLs, source, and dimensions — paginated |
+| `ta_get_location_reviews` | Traveler reviews — paginated |
 | `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (see below) |
 | `ta_web_get_location` | Location details (rating, address, coords, phone, photo) read from the public page via the browser bridge — **no API key needed** |
 
-All tools are read-only — the Content API has no write endpoints.
+All tools are read-only — Terra has no write endpoints.
 
 ### Browser bridge (optional)
 
@@ -46,7 +46,7 @@ It needs the extension installed and a one-time pairing approval; the Content
 API tools above never touch the bridge.
 
 `ta_web_get_location` uses this bridge to read a location's details straight
-from its public TripAdvisor page — so it works **without a Content API key**,
+from its public TripAdvisor page — so it works **without an API key**,
 covering attractions, hotels, and restaurants. It returns core business data
 (rating, review count, address, coordinates, phone, primary photo, listing
 URL) but not individual review text. Request shapes are pinned in
@@ -56,8 +56,7 @@ URL) but not individual review text. Request shapes are pinned in
 
 | Var | Required | Purpose |
 | --- | --- | --- |
-| `TRIPADVISOR_API_KEY` | yes | Content API key, sent as the `key` query parameter. |
-| `TRIPADVISOR_REFERER` | no | `Referer` header for domain-restricted keys (the API 403s without a matching referer). |
+| `TRIPADVISOR_API_KEY` | yes | Terra API key, sent as the `X-API-Key` header. |
 | `TRIPADVISOR_CACHE_TTL` | no | Seconds to cache search responses (default: 300; `0` disables). |
 | `TRIPADVISOR_STATIC_CACHE_TTL` | no | Seconds to cache details/photos/reviews (default: 3600; `0` disables). |
 | `TRIPADVISOR_REQUEST_TIMEOUT_MS` | no | Per-request timeout for the optional browser bridge (default: 30000). |
