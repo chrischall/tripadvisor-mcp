@@ -31,6 +31,7 @@ Get a key at [tripadvisor.com/developers](https://www.tripadvisor.com/developers
 | `ta_get_location_details` | Full details: rating, ranking, subratings, awards, review count, amenities, hours, listing URLs |
 | `ta_get_location_photos` | Photos with multi-size image URLs, captions, and source filter |
 | `ta_get_location_reviews` | Most recent reviews (up to 5 per call, pageable with `offset`) |
+| `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (see below) |
 
 All tools are read-only — the Content API has no write endpoints.
 
@@ -52,6 +53,8 @@ this foundation.
 | `TRIPADVISOR_REFERER` | no | `Referer` header for domain-restricted keys (the API 403s without a matching referer). |
 | `TRIPADVISOR_CACHE_TTL` | no | Seconds to cache search responses (default: 300; `0` disables). |
 | `TRIPADVISOR_STATIC_CACHE_TTL` | no | Seconds to cache details/photos/reviews (default: 3600; `0` disables). |
+| `TRIPADVISOR_REQUEST_TIMEOUT_MS` | no | Per-request timeout for the optional browser bridge (default: 30000). |
+| `TRIPADVISOR_DEBUG_LOG` | no | Set to `1` to log browser-bridge requests to stderr. |
 
 ## Development
 
