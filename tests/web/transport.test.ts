@@ -17,4 +17,15 @@ describe('createTripAdvisorTransport', () => {
     expect(captured!.serverName).toBe('tripadvisor-mcp');
     expect(captured!.capabilities).toContain('fetch');
   });
+
+  it("applies defaultSubdomain 'www' to every request", async () => {
+    // defaultSubdomain is a transport-adapter concern (applied per call), not a
+    // FetchproxyServer-constructor option — so it's asserted behaviorally: drive
+    // fetch() and inspect the subdomain the underlying server.request receives.
+    const request = vi.fn(async () => ({ status: 200, body: 'ok', url: 'https://www.tripadvisor.com/' }));
+    const createServer = () => ({ request } as unknown as FetchproxyServer);
+    const transport = createTripAdvisorTransport(createServer);
+    await transport.fetch({ method: 'GET', path: '/', headers: {} });
+    expect(request).toHaveBeenCalledWith('GET', '/', expect.objectContaining({ subdomain: 'www' }));
+  });
 });

@@ -4,18 +4,28 @@ Guidance for Claude working in this repo.
 
 ## TL;DR
 
-**TripAdvisor Content API** MCP server. Wraps the official read-only REST API
+**TripAdvisor Content API** MCP server, plus an optional browser-bridge tier.
+The primary tier wraps the official read-only REST API
 (`https://api.content.tripadvisor.com/api/v1`) and exposes 5 tools to Claude
 over stdio: location search, nearby search, location details, photos, and
-reviews.
+reviews. A second tier reaches the bot-walled consumer site via fetchproxy;
+today it ships only `ta_web_healthcheck`, with the `ta_web_*` data tools
+pending live capture.
 
-Auth is a Content API key (`TRIPADVISOR_API_KEY`) sent as the **`key` query
-parameter** — not a header — so this is the direct-API archetype with a thin
-custom `fetch` client (not `createApiClient`, whose token handling is
-header-shaped). The key is appended at fetch time only: cache keys and error
-messages are built from the key-less path and can never leak it. No fetchproxy,
-no writes (the Content API has no write endpoints — nothing is confirm-gated
+Auth for the primary tier is a Content API key (`TRIPADVISOR_API_KEY`) sent as
+the **`key` query parameter** — not a header — so this is the direct-API
+archetype with a thin custom `fetch` client (not `createApiClient`, whose token
+handling is header-shaped). The key is appended at fetch time only: cache keys
+and error messages are built from the key-less path and can never leak it. No
+writes (the Content API has no write endpoints — nothing is confirm-gated
 because nothing mutates).
+
+The web tier (`src/web/`) is the fleet's fetchproxy archetype: DataDome fronts
+tripadvisor.com, so those requests run as same-origin fetches in the user's
+signed-in tab via the bridge (fleet-shared port 37149). `@fetchproxy/server`
+is inlined by esbuild (not externalized), so the `.mcpb` bundle boots bare —
+guarded by `tests/server-boot.test.ts`. The primary API tools never touch the
+bridge.
 
 ## Environment
 
@@ -24,6 +34,9 @@ TRIPADVISOR_API_KEY=<key>            # Required. Create at https://www.tripadvis
 TRIPADVISOR_REFERER=<url>            # Optional. Referer header for domain-restricted keys
 TRIPADVISOR_CACHE_TTL=<secs>         # Optional. Search read-cache TTL (default 300; 0 disables)
 TRIPADVISOR_STATIC_CACHE_TTL=<secs>  # Optional. Details/photos/reviews TTL (default 3600; 0 disables)
+TRIPADVISOR_REQUEST_TIMEOUT_MS=<ms>  # Optional. Web-bridge per-request timeout (default 30000)
+TRIPADVISOR_DEBUG_LOG=1              # Optional. Log web-bridge requests to stderr
+TRIPADVISOR_WS_PORT=<port>           # Optional, tests only. Bridge port override (default 37149)
 ```
 
 `client.get(path, { cache })` is backed by an in-memory cache keyed by the
@@ -48,6 +61,9 @@ so the host's install-time `tools/list` probe still succeeds.
 - `src/tools/search.ts` — `ta_search_locations`, `ta_search_nearby`.
 - `src/tools/location.ts` — `ta_get_location_details`, `ta_get_location_photos`,
   `ta_get_location_reviews`.
+- `src/tools/web.ts` — `ta_web_healthcheck` (via `registerBridgeHealthcheckTool`).
+- `src/web/{transport,client,config}.ts` — the fetchproxy bridge tier
+  (transport on port 37149, generic web client with bot-wall guards, config).
 - `src/index.ts` — wires the registrars via `runMcp`; version from
   `src/version.ts` (single release-please-managed source).
 - `docs/TRIPADVISOR-API.md` — pinned request shapes from the official reference.
