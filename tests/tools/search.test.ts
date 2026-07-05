@@ -99,6 +99,22 @@ describe('search tools (Terra)', () => {
       expect(mockGet).not.toHaveBeenCalled();
     });
 
+    it('rejects a partial bounding box (1–3 of 4 corners), even with another valid center', async () => {
+      // partial box alone
+      expect((await harness.callTool('ta_search_nearby', { sw_lat: 37.8, sw_lon: -122.5 })).isError).toBe(true);
+      // partial box bleeding alongside a valid lat/lon center
+      expect(
+        (await harness.callTool('ta_search_nearby', { lat: 1, lon: 2, radius: 5, sw_lat: 37.8 })).isError,
+      ).toBe(true);
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+
+    it('rejects a lone lat or lon', async () => {
+      expect((await harness.callTool('ta_search_nearby', { lat: 1, radius: 5 })).isError).toBe(true);
+      expect((await harness.callTool('ta_search_nearby', { location_id: 3, radius: 5, lon: 2 })).isError).toBe(true);
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+
     it('requires radius for lat/lon and location_id modes', async () => {
       expect((await harness.callTool('ta_search_nearby', { lat: 42.3, lon: -71.1 })).isError).toBe(true);
       expect((await harness.callTool('ta_search_nearby', { location_id: 5 })).isError).toBe(true);

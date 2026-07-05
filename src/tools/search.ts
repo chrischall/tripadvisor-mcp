@@ -68,8 +68,25 @@ export function registerSearchTools(server: McpServer): void {
     },
     async (args) => {
       const { lat, lon, location_id, radius, sw_lat, sw_lon, ne_lat, ne_lon, compact, ...rest } = args;
+      const boxParts = [sw_lat, sw_lon, ne_lat, ne_lon];
+      const boxGiven = boxParts.filter((v) => v !== undefined).length;
+      // A partial box (1–3 of 4) is never valid: it can't form a center on its
+      // own, and if it rode alongside a lat/lon or location_id center it would
+      // bleed into the Terra URL and 400. Reject it before the center count.
+      if (boxGiven > 0 && boxGiven < 4) {
+        throw new McpToolError('ta_search_nearby bounding box needs all four of sw_lat, sw_lon, ne_lat, ne_lon.', {
+          hint: 'Provide all four box corners, or use lat+lon+radius or location_id+radius instead.',
+        });
+      }
+      // Same defect class: a lone lat or lon can't form a center and would bleed
+      // into the URL alongside another center — require them together or not at all.
+      if ((lat === undefined) !== (lon === undefined)) {
+        throw new McpToolError('ta_search_nearby needs both lat and lon together (or neither).', {
+          hint: 'Provide lat AND lon with a radius, or use location_id+radius or a sw/ne box.',
+        });
+      }
       const hasLatLon = lat !== undefined && lon !== undefined;
-      const hasBox = [sw_lat, sw_lon, ne_lat, ne_lon].every((v) => v !== undefined);
+      const hasBox = boxGiven === 4;
       const centers = [hasLatLon, location_id !== undefined, hasBox].filter(Boolean).length;
       if (centers !== 1) {
         throw new McpToolError(
