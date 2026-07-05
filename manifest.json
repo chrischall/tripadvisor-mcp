@@ -61,6 +61,10 @@
       "description": "Get details for a location (rating, address, hours, amenities)"
     },
     {
+      "name": "ta_get_locations",
+      "description": "Get details for multiple locations in one batch call"
+    },
+    {
       "name": "ta_get_location_photos",
       "description": "Get photos for a location"
     },

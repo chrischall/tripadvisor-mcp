@@ -52,9 +52,10 @@ npm install && npm run build
 
 | Tool | Use for |
 | --- | --- |
-| `ta_search_locations` | Find places by name — `query` required; filter with `category` (`RESTAURANT`/`ATTRACTION`/`HOTEL`), `country_code`, `geo_name`, `postal_code`, `locale`; page with `page`/`size` (max 20). Returns matches with a location `id`. |
-| `ta_search_nearby` | Find places near coordinates — `lat`+`lon`+`radius` required (`unit` `MI`/`KM`); filter `category`, `min_rating`, `sort` (`distance`/`rating`), `include_photo`. |
+| `ta_search_locations` | Find places by name — `query` required; filter with `category` (`RESTAURANT`/`ATTRACTION`/`HOTEL`), `country_code`, `geo_name`, `postal_code`, `locale`; page with `page`/`size` (max 20). `compact:true` → slim summaries. Returns matches with a location `id`. |
+| `ta_search_nearby` | Find places near a center — supply **one** of: `lat`+`lon`+`radius`, `location_id`+`radius`, or a `sw_lat`/`sw_lon`/`ne_lat`/`ne_lon` box (`unit` `MI`/`KM`); filter `category`, `min_rating`, `sort` (`distance`/`rating`), `include_photo`. `compact:true` supported. |
 | `ta_get_location_details` | Full listing for a location `id`: names, descriptions, address, coordinates, traveler ratings, phone, URLs. Optional `locale`. |
+| `ta_get_locations` | Batch details for **multiple** ids (`ids: [..]`, 1–50) in one call — cheaper than repeated details; unknown ids are omitted. `compact:true` supported. |
 | `ta_get_location_photos` | Photos (multi-size URLs, source, dimensions). Page with `page`/`size`. |
 | `ta_get_location_reviews` | Traveler reviews. Page with `page`/`size`. |
 | `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (fetchproxy Transporter). Reports bridge role/port/timing and an actionable hint if it's not connected. |

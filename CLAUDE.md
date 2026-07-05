@@ -61,9 +61,13 @@ so the host's install-time `tools/list` probe still succeeds.
   the `X-API-Key` header, two-tier TTL cache, 429 retry, status-specific errors).
 - `src/tools/shared.ts` — `LocationId`/`Category`/`LocaleList` schemas, the
   shared `pageParams`, and `qs()` (arrays → repeated params, e.g. `locale`).
-- `src/tools/search.ts` — `ta_search_locations`, `ta_search_nearby`.
-- `src/tools/location.ts` — `ta_get_location_details`, `ta_get_location_photos`,
-  `ta_get_location_reviews`.
+- `src/tools/search.ts` — `ta_search_locations`, `ta_search_nearby` (three
+  center modes: lat/lon+radius, location_id+radius, or sw/ne box — exactly one).
+- `src/tools/location.ts` — `ta_get_location_details`, `ta_get_locations`
+  (batch multi-get), `ta_get_location_photos`, `ta_get_location_reviews`.
+- `src/projection.ts` — pure opt-in `compact` projectors (`compactList` for
+  `{data:[{location}]}`, `compactLocationList` for `{data:[Location]}`); derive
+  category from the URL prefix; drift-fallback to raw on unexpected shapes.
 - `src/tools/web.ts` — `ta_web_healthcheck`, `ta_web_get_location`.
 - `src/web/{transport,client,config}.ts` — the fetchproxy bridge tier
   (transport on port 37149, generic web client with bot-wall guards, config).
