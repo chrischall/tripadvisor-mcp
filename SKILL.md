@@ -59,6 +59,7 @@ npm install && npm run build
 | `ta_get_location_photos` | Photos (multi-size URLs + captions). Page with `limit`/`offset`; filter `source` to `Expert`, `Management`, `Traveler`. |
 | `ta_get_location_reviews` | Up to 5 most-recent reviews per call; page with `offset`. |
 | `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (fetchproxy Transporter). Reports bridge role/port/timing and an actionable hint if it's not connected. |
+| `ta_web_get_location` | Get a location's details (rating, review count, address, coordinates, phone, photo, URL) from its public TripAdvisor page via the browser bridge — **works without a Content API key**. Covers attractions/hotels/restaurants; no individual review text. |
 
 ## Workflow
 

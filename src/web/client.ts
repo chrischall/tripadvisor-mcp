@@ -13,6 +13,7 @@ import { McpToolError } from '@chrischall/mcp-utils';
 import { bridgeErrorInfo, classifyBotWall, type FetchproxyTransport } from '@chrischall/mcp-utils/fetchproxy';
 import { debugLogEnabled } from './config.js';
 import { createTripAdvisorTransport } from './transport.js';
+import { locationDetailPath } from './parse.js';
 
 /** One bridge response — the `{status, body}` pair the tools inspect. */
 export interface BridgeResult {
@@ -111,6 +112,11 @@ export class TripAdvisorWebClient {
         hint: 'Open (or refresh) a www.tripadvisor.com tab in the paired browser so the challenge clears, then retry.',
       });
     }
+  }
+
+  /** Fetch a location detail page's HTML by numeric d-id (canonicalized by TripAdvisor). */
+  async getLocationHtml(locationId: number): Promise<string> {
+    return this.getHtml(locationDetailPath(locationId));
   }
 
   private assertNotWalled(status: number, body: string, path: string): void {

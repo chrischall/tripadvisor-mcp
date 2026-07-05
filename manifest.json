@@ -71,6 +71,10 @@
     {
       "name": "ta_web_healthcheck",
       "description": "Check the tripadvisor.com browser-bridge connection"
+    },
+    {
+      "name": "ta_web_get_location",
+      "description": "Get a location's details from the public page via the browser bridge (no API key)"
     }
   ],
   "compatibility": {
