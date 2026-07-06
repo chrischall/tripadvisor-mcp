@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.1.0...v0.2.0) (2026-07-05)
+
+
+### Features
+
+* batch multi-get, opt-in compact projection, nearby center modes ([#13](https://github.com/chrischall/tripadvisor-mcp/issues/13)) ([bd4167b](https://github.com/chrischall/tripadvisor-mcp/commit/bd4167bac1d135333f244b418c9aa3f978cafc7d))
+
+
+### Bug Fixes
+
+* reject partial nearby center params before they bleed into the URL ([#16](https://github.com/chrischall/tripadvisor-mcp/issues/16)) ([517f6e6](https://github.com/chrischall/tripadvisor-mcp/commit/517f6e6b2652df3533a8c33c9aba146684a13ec3)), closes [#14](https://github.com/chrischall/tripadvisor-mcp/issues/14)
+
 ## 0.1.0 (2026-07-05)
 
 
