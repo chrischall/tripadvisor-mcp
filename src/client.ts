@@ -1,6 +1,16 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadDotenvSafely, readEnvVar, formatApiError, truncateErrorMessage, McpToolError } from '@chrischall/mcp-utils';
+import {
+  loadDotenvSafely,
+  readEnvVar,
+  readTtlMsEnv,
+  createResponseCache,
+  parseRetryAfterMs,
+  formatApiError,
+  truncateErrorMessage,
+  McpToolError,
+  type ResponseCache,
+} from '@chrischall/mcp-utils';
 
 // Load .env for local dev; silently skip if dotenv is unavailable (e.g. the
 // .mcpb bundle). loadDotenvSafely never lets .env override a host-provided value.
@@ -17,30 +27,15 @@ const DEFAULT_CACHE_TTL_MS = 300_000;
 // Location details/photos/reviews change slowly — 1 hour by default.
 // Override with TRIPADVISOR_STATIC_CACHE_TTL (seconds; 0 = off).
 const DEFAULT_STATIC_CACHE_TTL_MS = 3_600_000;
-// Bound the cache so a long-lived server doesn't grow unbounded across many
-// distinct paths; oldest entries are evicted first.
-const CACHE_MAX_ENTRIES = 256;
 // Cap a server-supplied Retry-After so one bad header can't stall a tool call.
 const MAX_RETRY_AFTER_MS = 10_000;
-
-/** Resolve a cache TTL (ms) from an env var holding seconds. A blank or
- * non-numeric value falls back to `defaultMs`; a valid `0` disables caching. */
-function readCacheTtlMs(envVar: string, defaultMs: number): number {
-  const raw = readEnvVar(envVar);
-  if (raw === undefined) return defaultMs;
-  const secs = Number(raw);
-  return Number.isFinite(secs) && secs >= 0 ? secs * 1000 : defaultMs;
-}
 
 export class TripAdvisorClient {
   private readonly apiKey: string | null;
   private readonly configError: Error | null;
   private readonly fetchImpl: typeof fetch;
   private readonly sleep: (ms: number) => Promise<void>;
-  private readonly cacheTtlMs: number;
-  private readonly staticCacheTtlMs: number;
-  private readonly now: () => number;
-  private readonly cache = new Map<string, { expiresAt: number; value: unknown }>();
+  private readonly cache: ResponseCache;
 
   /**
    * Defer the config error so the server still boots (and answers the host's
@@ -56,11 +51,12 @@ export class TripAdvisorClient {
       now?: () => number;
     } = {},
   ) {
-    this.now = opts.now ?? Date.now;
+    const now = opts.now ?? Date.now;
     this.sleep = opts.sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
-    this.cacheTtlMs = opts.cacheTtlMs ?? readCacheTtlMs('TRIPADVISOR_CACHE_TTL', DEFAULT_CACHE_TTL_MS);
-    this.staticCacheTtlMs =
-      opts.staticCacheTtlMs ?? readCacheTtlMs('TRIPADVISOR_STATIC_CACHE_TTL', DEFAULT_STATIC_CACHE_TTL_MS);
+    const cacheTtlMs = opts.cacheTtlMs ?? readTtlMsEnv('TRIPADVISOR_CACHE_TTL', DEFAULT_CACHE_TTL_MS);
+    const staticCacheTtlMs =
+      opts.staticCacheTtlMs ?? readTtlMsEnv('TRIPADVISOR_STATIC_CACHE_TTL', DEFAULT_STATIC_CACHE_TTL_MS);
+    this.cache = createResponseCache({ ttlMs: { dynamic: cacheTtlMs, static: staticCacheTtlMs }, now });
     this.fetchImpl = opts.fetchImpl ?? fetch;
     const key = readEnvVar('TRIPADVISOR_API_KEY');
     if (!key) {
@@ -88,27 +84,8 @@ export class TripAdvisorClient {
    * (TRIPADVISOR_CACHE_TTL) is for searches.
    */
   async get<T = unknown>(path: string, opts: { cache?: 'dynamic' | 'static' } = {}): Promise<T> {
-    const ttl = opts.cache === 'static' ? this.staticCacheTtlMs : this.cacheTtlMs;
-    if (ttl > 0) {
-      const hit = this.cache.get(path);
-      if (hit && hit.expiresAt > this.now()) return hit.value as T;
-    }
-    const value = await this.request<T>(path);
-    if (ttl > 0) {
-      if (this.cache.size >= CACHE_MAX_ENTRIES) {
-        // Evict expired entries first; if still full, drop the oldest (Map
-        // preserves insertion order, so the first key is the oldest).
-        const t = this.now();
-        for (const [k, v] of this.cache) if (v.expiresAt <= t) this.cache.delete(k);
-        while (this.cache.size >= CACHE_MAX_ENTRIES) {
-          const oldest = this.cache.keys().next().value;
-          if (oldest === undefined) break;
-          this.cache.delete(oldest);
-        }
-      }
-      this.cache.set(path, { expiresAt: this.now() + ttl, value });
-    }
-    return value;
+    const tier = opts.cache === 'static' ? 'static' : 'dynamic';
+    return this.cache.fetchThrough(path, () => this.request<T>(path), tier) as Promise<T>;
   }
 
   private async request<T>(path: string, isRetry = false): Promise<T> {
@@ -121,8 +98,7 @@ export class TripAdvisorClient {
 
     const text = await res.text();
     if (res.status === 429 && !isRetry) {
-      const retryAfter = Number(res.headers.get('retry-after'));
-      const delayMs = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, MAX_RETRY_AFTER_MS) : 1_000;
+      const delayMs = parseRetryAfterMs(res.headers.get('retry-after'), { defaultMs: 1_000, capMs: MAX_RETRY_AFTER_MS });
       await this.sleep(delayMs);
       return this.request<T>(path, true);
     }
