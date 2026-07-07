@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "tripadvisor-mcp",
   "display_name": "TripAdvisor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "TripAdvisor location search, details, photos, and reviews for Claude via the Terra API",
   "author": {
     "name": "Chris Chall",
