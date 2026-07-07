@@ -90,3 +90,9 @@ so the host's install-time `tools/list` probe still succeeds.
   guards it; release-please bumps them (never hand-bump).
 - **Live verification is gated on a human-supplied key** — see the status
   section at the bottom of `docs/TRIPADVISOR-API.md`.
+
+## Pull requests & release notes
+
+Apply exactly one label per PR so it files under the right release-notes section (`enhancement` → Features, `bug` → Bug Fixes, `dependencies` → Dependencies, etc.), and give the PR title a Conventional-Commit prefix — release-please parses the squash-merged title to pick the version bump and changelog section.
+
+**Exception for first-party dependency bumps.** When bumping a package we own (`@chrischall/mcp-utils`, `@chrischall/realty-core`, `@fetchproxy/server` — anything published from a chrischall-owned repo), label the PR `enhancement` or `bug` instead of `dependencies`, and use the matching Conventional-Commit prefix (`feat:` or `fix:`) instead of `chore:`/`build(deps):`. Those bumps deliver real product fixes or features through us, so they should drive a release-please version bump and show up under Features/Bug Fixes in the release notes — not get hidden under "Dependencies" (which doesn't trigger a release).
