@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.2.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.2.0...v0.2.1) (2026-07-07)
+
+
+### Bug Fixes
+
+* bump @chrischall/mcp-utils to ^0.12.0 ([#20](https://github.com/chrischall/tripadvisor-mcp/issues/20)) ([f30f4fb](https://github.com/chrischall/tripadvisor-mcp/commit/f30f4fb85b8ed9da7f04e82a1d5036d2b5d7c53c))
+
+
+### Refactor
+
+* adopt mcp-utils createResponseCache (+ parseRetryAfterMs) ([#18](https://github.com/chrischall/tripadvisor-mcp/issues/18)) ([d30513f](https://github.com/chrischall/tripadvisor-mcp/commit/d30513f67ffd4d28a062dc488faa49a92e827afd))
+
+
+### Documentation
+
+* document first-party dependency-bump label exception ([#21](https://github.com/chrischall/tripadvisor-mcp/issues/21)) ([3029fcf](https://github.com/chrischall/tripadvisor-mcp/commit/3029fcff1cb24b497ed158170f0fe752f59d8b8a))
+
 ## [0.2.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.1.0...v0.2.0) (2026-07-05)
 
 
