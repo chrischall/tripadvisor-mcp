@@ -6,7 +6,7 @@ with **no Terra key** by routing through your own signed-in browser tab.
 Shapes captured live 2026-07-04; re-verify if parsing drifts (see
 `docs/TRIPADVISOR-WEB-API.md` in the repo for the full recon).
 
-Setup (once): see `SKILL.md`'s "Fallback tier" section
+Setup (once): see `../SKILL.md`'s "Fallback tier" section
 (`fpx profile add tripadvisor --domain tripadvisor.com` + `fpx pair -p tripadvisor`).
 
 ## Canonical URL — works for every category
