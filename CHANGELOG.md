@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.3.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.2.1...v0.3.0) (2026-07-13)
+
+
+### Features
+
+* **skill:** add tripadvisor api access skill ([#25](https://github.com/chrischall/tripadvisor-mcp/issues/25)) ([cd3247a](https://github.com/chrischall/tripadvisor-mcp/commit/cd3247a977eccf60ec31f4a71b91f76b66ac721e))
+
+
+### Refactor
+
+* **skill:** move root SKILL.md into skills/, point plugin.json at ./skills/ ([#28](https://github.com/chrischall/tripadvisor-mcp/issues/28)) ([36a2295](https://github.com/chrischall/tripadvisor-mcp/commit/36a2295a5d68afe310e9d584189f2d62b186c8f5))
+
+
+### Documentation
+
+* **skill:** add search_type param to terra-endpoints §1 ([#30](https://github.com/chrischall/tripadvisor-mcp/issues/30)) ([454fe18](https://github.com/chrischall/tripadvisor-mcp/commit/454fe187945b14922ca44cfe0d3f1a1af8cdcfae)), closes [#26](https://github.com/chrischall/tripadvisor-mcp/issues/26)
+
 ## [0.2.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.2.0...v0.2.1) (2026-07-07)
 
 
