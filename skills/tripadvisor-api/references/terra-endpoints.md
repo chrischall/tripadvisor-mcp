@@ -19,8 +19,9 @@ list endpoints defaults to 20 and is **capped at 20**.
 ## 1. Location search (`ta_search_locations` / `src/tools/search.ts`)
 
 `GET /locations/search` — `query` (1–500 chars) required; optional
-`category`, `country_code` (alpha-2), `geo_name`, `postal_code` (takes
-precedence over `geo_name`), `locale` (repeated), `page`, `size`.
+`category`, `search_type` (default `NAME`), `country_code` (alpha-2),
+`geo_name`, `postal_code` (takes precedence over `geo_name`), `locale`
+(repeated), `page`, `size`.
 
 ```sh
 curl -sS "${H[@]}" "$BASE/locations/search?query=Golden+Gate+Bridge&category=ATTRACTION" \
