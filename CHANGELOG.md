@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.0...v0.3.1) (2026-07-25)
+
+
+### Bug Fixes
+
+* **deps:** bump fast-uri out of the host-confusion advisories ([#34](https://github.com/chrischall/tripadvisor-mcp/issues/34)) ([bc83c2f](https://github.com/chrischall/tripadvisor-mcp/commit/bc83c2febfe8c31e69ca0d52aa541debf270380a))
+
 ## [0.3.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.2.1...v0.3.0) (2026-07-13)
 
 
