@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.2...v0.3.3) (2026-08-06)
+
+
+### Bug Fixes
+
+* **deps:** move to @fetchproxy/server 2.0.0 for the v3 handshake ([#43](https://github.com/chrischall/tripadvisor-mcp/issues/43)) ([279e19c](https://github.com/chrischall/tripadvisor-mcp/commit/279e19c3326e847a49781b25b75d34ccbe4f5fd7))
+
 ## [0.3.2](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.1...v0.3.2) (2026-07-30)
 
 
