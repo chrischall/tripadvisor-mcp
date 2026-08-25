@@ -4,18 +4,6 @@ slug: tripadvisor
 summary: >-
   TripAdvisor location search, details, photos, and reviews for Claude via
   the Terra API
-  - name: TRIPADVISOR_CACHE_TTL
-    required: false
-    help: >-
-      Seconds to cache search responses (default 300; 0 disables).
-  - name: TRIPADVISOR_STATIC_CACHE_TTL
-    required: false
-    help: >-
-      Seconds to cache details, photos and reviews (default 3600; 0 disables).
-  - name: TRIPADVISOR_DEBUG_LOG
-    required: false
-    help: >-
-      Set to 1 to log browser-bridge requests to stderr.
 #
 # Hosting note (a comment, not user-facing summary text): this is a
 # BROWSER-BRIDGE MCP — it reaches its site through the user's signed-in
@@ -41,6 +29,18 @@ env:
       fleet-shared 37149). The runner injects a per-registration port for a
       hosted bridged child, so this is the name to give bridgePortEnv at
       registration.
+  - name: TRIPADVISOR_CACHE_TTL
+    required: false
+    help: >-
+      Seconds to cache search responses (default 300; 0 disables).
+  - name: TRIPADVISOR_STATIC_CACHE_TTL
+    required: false
+    help: >-
+      Seconds to cache details, photos and reviews (default 3600; 0 disables).
+  - name: TRIPADVISOR_DEBUG_LOG
+    required: false
+    help: >-
+      Set to 1 to log browser-bridge requests to stderr.
 state:
   dataDir: true
   reason: >-
