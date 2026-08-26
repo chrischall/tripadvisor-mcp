@@ -1,5 +1,5 @@
 ---
-name: tripadvisor-mcp
+name: tripadvisor
 description: TripAdvisor travel data via the Terra API through MCP. Use when the user asks to find hotels, restaurants, or attractions, look up a place's TripAdvisor rating/reviews/photos, compare places to stay or eat, or find what's near a location. Triggers on phrases like "find a hotel in", "best restaurants near", "TripAdvisor reviews for", "what's the rating of", "things to do in", or "attractions near me". Requires the @chrischall/tripadvisor-mcp package installed and the tripadvisor server registered (see Setup), plus a TripAdvisor Terra API key.
 ---
 
