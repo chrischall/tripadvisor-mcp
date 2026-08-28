@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.5](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.4...v0.3.5) (2026-08-28)
+
+
+### Bug Fixes
+
+* **egress:** declare every host the server dials in mint.yaml ([#60](https://github.com/chrischall/tripadvisor-mcp/issues/60)) ([17aec61](https://github.com/chrischall/tripadvisor-mcp/commit/17aec612b479ed6490620b3e846b8ccf82056793))
+
 ## [0.3.4](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.3...v0.3.4) (2026-08-26)
 
 
