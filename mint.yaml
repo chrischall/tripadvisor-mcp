@@ -53,4 +53,11 @@ egress:
     # Only hosts the SERVER process actually fetches. Hosts that appear
     # solely in a URL this server BUILDS and returns are excluded.
     - terra.tripadvisor.com
-    - tripadvisor.com
+    #
+    # NOT listed on purpose: www.tripadvisor.com (and the tripadvisor.com
+    # apex). The web tools reach the consumer site through the fetchproxy
+    # BROWSER BRIDGE — each request is a same-origin fetch executed in the
+    # user's signed-in tab, so the browser dials it, never this process, and
+    # there is no direct (bridge-less) mode. The only host the process itself
+    # fetches is the Terra API above; the www hostname appears in src only in
+    # error hints and returned deep-links.
