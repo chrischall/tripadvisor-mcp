@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.4](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.3...v0.3.4) (2026-08-26)
+
+
+### Bug Fixes
+
+* declare the three documented optional env vars in mint.yaml ([#54](https://github.com/chrischall/tripadvisor-mcp/issues/54)) ([1e4fa7d](https://github.com/chrischall/tripadvisor-mcp/commit/1e4fa7d2c9240982b8656e2bb0067ed5bd50b5a7))
+
+
+### Documentation
+
+* **skill:** declare the name this skill actually publishes under ([#58](https://github.com/chrischall/tripadvisor-mcp/issues/58)) ([2806437](https://github.com/chrischall/tripadvisor-mcp/commit/280643774ebbdd89d72c8731aa8da8f291124664))
+
 ## [0.3.3](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.2...v0.3.3) (2026-08-06)
 
 
