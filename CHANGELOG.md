@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.5...v0.4.0) (2026-08-29)
+
+
+### Features
+
+* **deps:** take @fetchproxy/server 2.2.0 so the concentrator can bind its sandbox address ([#63](https://github.com/chrischall/tripadvisor-mcp/issues/63)) ([601f6d5](https://github.com/chrischall/tripadvisor-mcp/commit/601f6d5a1f81e44ff16b1349a9bb080d5347c5bd))
+
 ## [0.3.5](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.4...v0.3.5) (2026-08-28)
 
 
