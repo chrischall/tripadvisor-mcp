@@ -52,14 +52,54 @@ npm install && npm run build
 
 | Tool | Use for |
 | --- | --- |
-| `ta_search_locations` | Find places by name — `query` required; filter with `category` (`RESTAURANT`/`ATTRACTION`/`HOTEL`), `country_code`, `geo_name`, `postal_code`, `locale`; page with `page`/`size` (max 20). `compact:true` → slim summaries. Returns matches with a location `id`. |
-| `ta_search_nearby` | Find places near a center — supply **one** of: `lat`+`lon`+`radius`, `location_id`+`radius`, or a `sw_lat`/`sw_lon`/`ne_lat`/`ne_lon` box (`unit` `MI`/`KM`); filter `category`, `min_rating`, `sort` (`distance`/`rating`), `include_photo`. `compact:true` supported. |
+| `ta_search_locations` | Find places by name — `query` required; filter with `category` (`RESTAURANT`/`ATTRACTION`/`HOTEL`), `country_code`, `geo_name`, `postal_code`, `locale`; page with `page`/`size` (max 20). Returns matches with a location `id`. |
+| `ta_search_nearby` | Find places near a center — supply **one** of: `lat`+`lon`+`radius`, `location_id`+`radius`, or a `sw_lat`/`sw_lon`/`ne_lat`/`ne_lon` box (`unit` `MI`/`KM`); filter `category`, `min_rating`, `sort` (`distance`/`rating`), `include_photo`. |
 | `ta_get_location_details` | Full listing for a location `id`: names, descriptions, address, coordinates, traveler ratings, phone, URLs. Optional `locale`. |
-| `ta_get_locations` | Batch details for **multiple** ids (`ids: [..]`, 1–50) in one call — cheaper than repeated details; unknown ids are omitted. `compact:true` supported. |
+| `ta_get_locations` | Batch details for **multiple** ids (`ids: [..]`, 1–50) in one call — cheaper than repeated details; unknown ids are omitted. |
 | `ta_get_location_photos` | Photos (multi-size URLs, source, dimensions). Page with `page`/`size`. |
 | `ta_get_location_reviews` | Traveler reviews. Page with `page`/`size`. |
 | `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (fetchproxy Transporter). Reports bridge role/port/timing and an actionable hint if it's not connected. |
 | `ta_web_get_location` | Get a location's details (rating, review count, address, coordinates, phone, photo, URL) from its public TripAdvisor page via the browser bridge — **works without an API key**. Covers attractions/hotels/restaurants; no individual review text. |
+
+## Response shape
+
+`ta_search_locations`, `ta_search_nearby`, `ta_get_locations` and
+`ta_get_location_reviews` take `view: "compact" | "full"`, and **`compact` is
+the default** — the slim rung is what you get without asking for it. Pass
+`view: "full"` for TripAdvisor's whole records.
+
+The compact rung is not the same operation on all four:
+
+- `ta_search_locations`, `ta_search_nearby` and `ta_get_locations` run a real
+  field projection over each Terra location, keeping `id`, `name`, `category`
+  (derived from the listing URL prefix), `geo`, `city`, `state`, `rating`,
+  `review_count` and `url` — plus `distance_miles` / `distance_kilometers` on
+  nearby results. `pagination` is preserved. On an unexpected shape the
+  projection warns to stderr and returns the raw payload rather than a page of
+  empties.
+- `ta_get_location_reviews` has no projection, so its compact rung strips image
+  URLs — reviewer avatars and per-review snapshots — and leaves everything else,
+  review text included, exactly as TripAdvisor sent it.
+
+The other four tools take no `view`, each for its own reason:
+
+- `ta_get_location_photos` — its product **is** the image URLs. A photos item
+  hangs its whole payload off the `photo` media key, so stripping would not
+  shrink the response, it would empty it, leaving ids pointing at nothing.
+- `ta_web_get_location` — the opposite case: it returns no upstream payload at
+  all. The page parser already projects down to a dozen named fields, and the
+  `image` among them is a deliberate pick from a page offering hundreds.
+- `ta_get_location_details` — its compact rung would be the same location row
+  `ta_search_locations` already handed you with the `id`, so it would return
+  what you already have, on the one tool you call to get more than that.
+- `ta_web_healthcheck` — it reports a diagnosis it assembles itself, not a
+  TripAdvisor record.
+
+A rung that cannot change anything is worse than no parameter.
+
+(This replaced an opt-in `compact: true` flag. Passing `compact` now does
+nothing — zod drops the unknown key and you get the compact rung regardless,
+which is what the flag used to ask for.)
 
 ## Workflow
 
