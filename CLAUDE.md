@@ -86,7 +86,7 @@ so the host's install-time `tools/list` probe still succeeds.
 
 - **Path-injection guards.** `locationId` is a positive-int zod schema
   interpolated into the URL path; `category`/`unit`/`sort` are enums.
-- **`view` is per-tool, and two tools deliberately don't take one.**
+- **`view` is per-tool, and FOUR of the eight tools deliberately don't take one.**
   `ta_search_locations` / `ta_search_nearby` / `ta_get_locations` route through
   a hand-written projector; `ta_get_location_reviews` has no projection, so its
   compact rung is `stripMediaUrls` — avatars are incidental to review text.
@@ -97,6 +97,18 @@ so the host's install-time `tools/list` probe still succeeds.
   down to named fields including a deliberate `image`, and media-stripping a
   grounded projection lets a blind rule overrule a grounded one (the
   viator-mcp `coverImageUrl` regression). Each carries a comment saying so.
+  The other two are `ta_get_location_details`, whose compact rung would be
+  `compactLocation` — the same row `ta_search_locations` already returned
+  alongside the id you looked it up with, so the rung would answer the question
+  you had just stopped asking — and `ta_web_healthcheck`, which reports a
+  diagnosis rather than a record and has nothing to project.
+
+  The count was wrong here before (it said "two" while naming two and omitting
+  two), which is the same undercount that keeps catching this fleet: the tool
+  surface is EIGHT, not the seven a `grep` for `registerTool(` string literals
+  finds, because `ta_web_healthcheck` registers through
+  `registerBridgeHealthcheckTool`. Establish a roster by calling the registrars
+  against a stub server, never by scanning source text.
 - **TDD.** Tests mock `client.get` (tools) or `fetchImpl` (client); no real
   network in CI. `tests/server-boot.test.ts` spawns the real bundle/bin.
 - **Version sync.** `package.json`, `src/version.ts`, `manifest.json`,
