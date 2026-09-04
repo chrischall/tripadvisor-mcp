@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.5.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.4.0...v0.5.0) (2026-09-04)
+
+
+### Features
+
+* **tools:** compact by default, on the projection this repo already had ([#75](https://github.com/chrischall/tripadvisor-mcp/issues/75)) ([5fc65b7](https://github.com/chrischall/tripadvisor-mcp/commit/5fc65b7c1986cb38874757376e18b93672d305e9))
+
+
+### Bug Fixes
+
+* **deps:** pick up @chrischall/mcp-utils 0.23.2 ([#81](https://github.com/chrischall/tripadvisor-mcp/issues/81)) ([fcbd1df](https://github.com/chrischall/tripadvisor-mcp/commit/fcbd1df109d17db83eddd04c21e7936041179282))
+
+
+### Documentation
+
+* **claude:** make the first-party dep-bump rule about the type, not the scope ([#83](https://github.com/chrischall/tripadvisor-mcp/issues/83)) ([f934332](https://github.com/chrischall/tripadvisor-mcp/commit/f93433299d772d1af54195aff5086db7fa59a871))
+
 ## [0.4.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.3.5...v0.4.0) (2026-08-29)
 
 
