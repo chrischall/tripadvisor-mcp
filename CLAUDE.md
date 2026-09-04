@@ -65,9 +65,12 @@ so the host's install-time `tools/list` probe still succeeds.
   center modes: lat/lon+radius, location_id+radius, or sw/ne box — exactly one).
 - `src/tools/location.ts` — `ta_get_location_details`, `ta_get_locations`
   (batch multi-get), `ta_get_location_photos`, `ta_get_location_reviews`.
-- `src/projection.ts` — pure opt-in `compact` projectors (`compactList` for
+- `src/projection.ts` — the pure `compact` projectors (`compactList` for
   `{data:[{location}]}`, `compactLocationList` for `{data:[Location]}`); derive
   category from the URL prefix; drift-fallback to raw on unexpected shapes.
+- `src/view.ts` — the `view` rungs this server honours (`compact` | `full`,
+  **compact by default**) and `viewResponse`, which dispatches a rung to the
+  named projector or, where no projection exists, to `stripMediaUrls`.
 - `src/tools/web.ts` — `ta_web_healthcheck`, `ta_web_get_location`.
 - `src/web/{transport,client,config}.ts` — the fetchproxy bridge tier
   (transport on port 37149, generic web client with bot-wall guards, config).
@@ -83,6 +86,17 @@ so the host's install-time `tools/list` probe still succeeds.
 
 - **Path-injection guards.** `locationId` is a positive-int zod schema
   interpolated into the URL path; `category`/`unit`/`sort` are enums.
+- **`view` is per-tool, and two tools deliberately don't take one.**
+  `ta_search_locations` / `ta_search_nearby` / `ta_get_locations` route through
+  a hand-written projector; `ta_get_location_reviews` has no projection, so its
+  compact rung is `stripMediaUrls` — avatars are incidental to review text.
+  `ta_get_location_photos` takes **no** `view`: its product IS the image URLs,
+  and a photos item's whole payload hangs off the media key `photo`, so
+  stripping would empty it rather than shrink it. `ta_web_get_location` takes
+  none either, for the opposite reason — `parse.ts` already projects the page
+  down to named fields including a deliberate `image`, and media-stripping a
+  grounded projection lets a blind rule overrule a grounded one (the
+  viator-mcp `coverImageUrl` regression). Each carries a comment saying so.
 - **TDD.** Tests mock `client.get` (tools) or `fetchImpl` (client); no real
   network in CI. `tests/server-boot.test.ts` spawns the real bundle/bin.
 - **Version sync.** `package.json`, `src/version.ts`, `manifest.json`,

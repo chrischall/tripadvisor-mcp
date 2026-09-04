@@ -1,24 +1,19 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult, McpToolError } from '@chrischall/mcp-utils';
+import { McpToolError } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
 import { Category, LocaleList, pageParams, qs } from './shared.js';
-import { compactList } from '../projection.js';
+import { viewArg, viewResponse } from '../view.js';
 
-/** `compact` arg shared by the list-returning search tools. */
-const compactParam = {
-  compact: z
-    .boolean()
-    .optional()
-    .describe('Return a slim summary per result (id, name, category, city, rating, review_count, url) instead of full records'),
-};
+/** The `view` arg shared by the list-returning search tools. */
+const viewParamShared = { view: viewArg() };
 
 export function registerSearchTools(server: McpServer): void {
   server.registerTool(
     'ta_search_locations',
     {
       description:
-        'Search TripAdvisor locations (restaurants, attractions, hotels) by name. Returns matches with a location id for the detail tools, plus pagination. Pass compact:true for slim summaries.',
+        'Search TripAdvisor locations (restaurants, attractions, hotels) by name. Returns matches with a location id for the detail tools, plus pagination. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {
         query: z.string().min(1).max(500).describe('Text to search location names for'),
@@ -28,15 +23,15 @@ export function registerSearchTools(server: McpServer): void {
         postal_code: z.string().optional().describe('Postal/ZIP code (takes precedence over geo_name)'),
         locale: LocaleList,
         ...pageParams,
-        ...compactParam,
+        ...viewParamShared,
       },
     },
-    async ({ query, category, country_code, geo_name, postal_code, locale, page, size, compact }) => {
+    async ({ query, category, country_code, geo_name, postal_code, locale, page, size, view }) => {
       const data = await client.get(
         `/locations/search${qs({ query, category, country_code, geo_name, postal_code, locale, page, size })}`,
         { cache: 'dynamic' },
       );
-      return textResult(compact ? compactList(data) : data);
+      return viewResponse(view, data, 'list');
     },
   );
 
@@ -44,7 +39,7 @@ export function registerSearchTools(server: McpServer): void {
     'ta_search_nearby',
     {
       description:
-        'Find TripAdvisor locations near a point within a radius, or inside a bounding box. Center by lat+lon+radius, by a reference location_id+radius, or by a sw/ne bounding box. Returns matches with distance and a location id. Pass compact:true for slim summaries.',
+        'Find TripAdvisor locations near a point within a radius, or inside a bounding box. Center by lat+lon+radius, by a reference location_id+radius, or by a sw/ne bounding box. Returns matches with distance and a location id. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {
         // Center — supply exactly one of: lat+lon, location_id, or the sw/ne box.
@@ -63,11 +58,11 @@ export function registerSearchTools(server: McpServer): void {
         sort: z.enum(['distance', 'rating']).optional().describe('Sort order (default distance)'),
         locale: LocaleList,
         ...pageParams,
-        ...compactParam,
+        ...viewParamShared,
       },
     },
     async (args) => {
-      const { lat, lon, location_id, radius, sw_lat, sw_lon, ne_lat, ne_lon, compact, ...rest } = args;
+      const { lat, lon, location_id, radius, sw_lat, sw_lon, ne_lat, ne_lon, view, ...rest } = args;
       const boxParts = [sw_lat, sw_lon, ne_lat, ne_lon];
       const boxGiven = boxParts.filter((v) => v !== undefined).length;
       // A partial box (1–3 of 4) is never valid: it can't form a center on its
@@ -103,7 +98,7 @@ export function registerSearchTools(server: McpServer): void {
         `/locations/nearby${qs({ lat, lon, location_id, radius, sw_lat, sw_lon, ne_lat, ne_lon, ...rest })}`,
         { cache: 'dynamic' },
       );
-      return textResult(compact ? compactList(data) : data);
+      return viewResponse(view, data, 'list');
     },
   );
 }

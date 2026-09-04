@@ -1,6 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerBridgeHealthcheckTool } from '@chrischall/mcp-utils/fetchproxy';
-import { McpToolError, textResult } from '@chrischall/mcp-utils';
+import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
 import { webClient } from '../web/client.js';
 import { parseLocationDetail } from '../web/parse.js';
 import { LocationId } from './shared.js';
@@ -32,6 +32,14 @@ export function registerWebTools(server: McpServer): void {
     probeFn: (path) => webClient.getHtml(path),
   });
 
+  // NO `view` on this tool, deliberately, and for the OPPOSITE reason to
+  // `ta_get_location_photos`. It does not return an upstream payload at all:
+  // `parseLocationDetail` is already a hand-written projection down to a dozen
+  // named fields, and one of them is `image` — chosen on purpose, from a page
+  // that offers hundreds. Media-stripping a grounded projection lets a blind
+  // subtractive rule overrule a rule written with knowledge of the source,
+  // which is exactly what deleted viator-mcp's `coverImageUrl`
+  // (chrischall/viator-mcp#72). There is no cheaper rung to offer here.
   server.registerTool(
     'ta_web_get_location',
     {
@@ -50,7 +58,7 @@ export function registerWebTools(server: McpServer): void {
           hint: 'The page may be a bot-challenge shell or the id may be wrong — run ta_web_healthcheck and confirm a signed-in www.tripadvisor.com tab is open, then retry.',
         });
       }
-      return textResult({ location_id: locationId, ...detail });
+      return minifiedResult({ location_id: locationId, ...detail });
     },
   );
 }
