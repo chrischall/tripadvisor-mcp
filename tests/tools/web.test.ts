@@ -33,10 +33,10 @@ describe('ta_web_get_location', () => {
     expect(mockGetLocationHtml).toHaveBeenCalledWith(104675);
     expect(result.isError).toBeFalsy();
     const text = (result.content[0] as { text: string }).text;
-    expect(text).toContain('"location_id": 104675');
-    expect(text).toContain('"name": "Golden Gate Bridge"');
-    expect(text).toContain('"rating": 4.7');
-    expect(text).toContain('"review_count": 49969');
+    expect(text).toContain('"location_id":104675');
+    expect(text).toContain('"name":"Golden Gate Bridge"');
+    expect(text).toContain('"rating":4.7');
+    expect(text).toContain('"review_count":49969');
   });
 
   it('rejects a non-integer id before any fetch', async () => {

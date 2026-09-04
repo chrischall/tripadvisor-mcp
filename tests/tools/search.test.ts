@@ -50,15 +50,15 @@ describe('search tools (Terra)', () => {
       expect(mockGet).not.toHaveBeenCalled();
     });
 
-    it('projects to compact when requested', async () => {
+    it('projects to compact BY DEFAULT', async () => {
       mockGet.mockResolvedValueOnce({
         data: [{ location: { id: 7, names: [{ value: 'Z', primary: true }] }, matched_value: { value: 'Z' } }],
         pagination: { page: 1 },
       });
-      const result = await harness.callTool('ta_search_locations', { query: 'z', compact: true });
+      const result = await harness.callTool('ta_search_locations', { query: 'z' });
       const text = (result.content[0] as { text: string }).text;
-      expect(text).toContain('"id": 7');
-      expect(text).toContain('"name": "Z"');
+      expect(text).toContain('"id":7');
+      expect(text).toContain('"name":"Z"');
       expect(text).not.toContain('matched_value');
     });
   });

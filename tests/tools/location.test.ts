@@ -23,14 +23,14 @@ describe('location tools (Terra)', () => {
       expect(mockGet).toHaveBeenCalledWith('/locations?id=1&id=2&id=3', { cache: 'static' });
     });
 
-    it('projects to compact when requested', async () => {
+    it('projects to compact BY DEFAULT', async () => {
       mockGet.mockResolvedValueOnce({
         data: [{ id: 1, names: [{ value: 'A', primary: true }], traveler_ratings: { overall: { rating: 4, count: 2 } } }],
       });
-      const result = await harness.callTool('ta_get_locations', { ids: [1], compact: true });
+      const result = await harness.callTool('ta_get_locations', { ids: [1] });
       const text = (result.content[0] as { text: string }).text;
-      expect(text).toContain('"name": "A"');
-      expect(text).toContain('"rating": 4');
+      expect(text).toContain('"name":"A"');
+      expect(text).toContain('"rating":4');
       expect(text).not.toContain('traveler_ratings');
     });
 

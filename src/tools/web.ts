@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerBridgeHealthcheckTool } from '@chrischall/mcp-utils/fetchproxy';
-import { McpToolError, textResult } from '@chrischall/mcp-utils';
+import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
+import { viewArg, viewResponse } from '../view.js';
 import { webClient } from '../web/client.js';
 import { parseLocationDetail } from '../web/parse.js';
 import { LocationId } from './shared.js';
@@ -50,7 +51,7 @@ export function registerWebTools(server: McpServer): void {
           hint: 'The page may be a bot-challenge shell or the id may be wrong — run ta_web_healthcheck and confirm a signed-in www.tripadvisor.com tab is open, then retry.',
         });
       }
-      return textResult({ location_id: locationId, ...detail });
+      return minifiedResult({ location_id: locationId, ...detail });
     },
   );
 }
