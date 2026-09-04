@@ -109,4 +109,15 @@ so the host's install-time `tools/list` probe still succeeds.
 
 Apply exactly one label per PR so it files under the right release-notes section (`enhancement` → Features, `bug` → Bug Fixes, `dependencies` → Dependencies, etc.), and give the PR title a Conventional-Commit prefix — release-please parses the squash-merged title to pick the version bump and changelog section.
 
-**Exception for first-party dependency bumps.** When bumping a package we own (`@chrischall/mcp-utils`, `@chrischall/realty-core`, `@fetchproxy/server` — anything published from a chrischall-owned repo), label the PR `enhancement` or `bug` instead of `dependencies`, and use the matching Conventional-Commit prefix (`feat:` or `fix:`) instead of `chore:`/`build(deps):`. Those bumps deliver real product fixes or features through us, so they should drive a release-please version bump and show up under Features/Bug Fixes in the release notes — not get hidden under "Dependencies" (which doesn't trigger a release).
+**Exception for first-party dependency bumps.** When bumping a package we own (`@chrischall/mcp-utils`, `@chrischall/realty-core`, `@fetchproxy/*` — anything published from a chrischall-owned repo), label the PR `enhancement` or `bug` instead of `dependencies`, and give it a Conventional-Commit **type** of `feat` or `fix` instead of `chore`/`build`. Those bumps deliver real product fixes or features through us, so they should drive a release-please version bump and show up under Features/Bug Fixes in the release notes — not get hidden under "Dependencies" (which doesn't trigger a release).
+
+**The rule is about the type, not the scope.** `fix(deps):` and `feat(deps):` are correct here, and so are the bare `fix:`/`feat:` forms. release-please picks the bump and the changelog section from the type alone; a scope only prefixes the changelog line (`* **deps:** …`). Both spellings are fine — what is never fine is `build(deps):` or `chore(deps):`, where the *type* is the part that ships nothing.
+
+Live evidence from this repo's own history, both visible in the pending 0.5.0 release PR:
+
+| PR | Title | Result |
+|---|---|---|
+| #81 | `fix(deps): pick up @chrischall/mcp-utils 0.23.2` | patch bump, filed under **Bug Fixes** |
+| #79 | `build(deps): pick up @chrischall/mcp-utils 0.23.1` | no bump, **absent from the changelog entirely** |
+
+An auto-review round read the paragraph above literally and flagged #81's correct `fix(deps):` as a violation for not being a bare `fix:` — a false positive off wording, on the one PR that got it right. Naming the type is what the rule always meant.
