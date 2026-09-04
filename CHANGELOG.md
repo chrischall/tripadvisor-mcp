@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.5.0...v0.5.1) (2026-09-04)
+
+
+### Documentation
+
+* [#85](https://github.com/chrischall/tripadvisor-mcp/issues/85) recorded an open question as a settled decision ([#87](https://github.com/chrischall/tripadvisor-mcp/issues/87)) ([c15efe2](https://github.com/chrischall/tripadvisor-mcp/commit/c15efe20900da8f7deabb1197f95d7e0645c415b))
+* CLAUDE.md said two tools take no `view`; four do ([#85](https://github.com/chrischall/tripadvisor-mcp/issues/85)) ([b8f728b](https://github.com/chrischall/tripadvisor-mcp/commit/b8f728bdf9e05d9e39dcf5b07a60c09bcc76aaf9))
+
 ## [0.5.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.4.0...v0.5.0) (2026-09-04)
 
 
