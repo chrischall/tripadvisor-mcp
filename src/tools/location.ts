@@ -3,7 +3,6 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
 import { LocationId, LocaleList, pageParams, qs } from './shared.js';
-import { compactLocationList } from '../projection.js';
 import { viewArg, viewResponse } from '../view.js';
 
 export function registerLocationTools(server: McpServer): void {
@@ -42,6 +41,14 @@ export function registerLocationTools(server: McpServer): void {
     },
   );
 
+  // NO `view` on this tool, deliberately. Its product IS the image URLs: a
+  // photos item is `{id, location_id, photo: {key, original_size_url, …}, …}`
+  // (docs/TRIPADVISOR-API.md §5), and `photo` is a media KEY — stripping it
+  // does not shrink the response, it EMPTIES it, leaving ids and a publish
+  // timestamp pointing at nothing. Same rule as `musicbrainz_cover_art`,
+  // `alltrails_get_trail_photos`, `sw_get_receipt` and redfin's photo bundles
+  // — see @chrischall/mcp-utils' `stripMediaUrls` docs ("Never apply this to a
+  // tool whose PRODUCT is the image. The tool's own name is the test.").
   server.registerTool(
     'ta_get_location_photos',
     {
@@ -61,22 +68,31 @@ export function registerLocationTools(server: McpServer): void {
     },
   );
 
+  // `view` DOES belong here, and it is the opposite case to photos above. A
+  // review's product is its TEXT; the image URLs it carries — reviewer avatars,
+  // per-review snapshots — are incidental to the thing the caller asked for, so
+  // dropping them shrinks the payload instead of emptying it. There is no
+  // hand-written projection for this shape, so `viewResponse` falls through to
+  // `stripMediaUrls`, which needs no knowledge of the fields.
   server.registerTool(
     'ta_get_location_reviews',
     {
-      description: 'Get traveler reviews for a TripAdvisor location, with pagination.',
+      description:
+        'Get traveler reviews for a TripAdvisor location, with pagination. Reviewer avatars and other image URLs ' +
+        'are dropped by default; pass view:"full" for TripAdvisor\'s whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {
         locationId: LocationId,
         locale: LocaleList,
         ...pageParams,
+        view: viewArg(),
       },
     },
-    async ({ locationId, locale, page, size }) => {
+    async ({ locationId, locale, page, size, view }) => {
       const data = await client.get(`/locations/${locationId}/reviews${qs({ locale, page, size })}`, {
         cache: 'static',
       });
-      return minifiedResult(data);
+      return viewResponse(view, data);
     },
   );
 }

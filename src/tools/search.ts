@@ -1,9 +1,8 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
+import { McpToolError } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
 import { Category, LocaleList, pageParams, qs } from './shared.js';
-import { compactList } from '../projection.js';
 import { viewArg, viewResponse } from '../view.js';
 
 /** The `view` arg shared by the list-returning search tools. */

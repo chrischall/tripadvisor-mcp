@@ -17,7 +17,14 @@ import { compactList, compactLocationList } from './projection.js';
  * subtractive rule over its output would let an un-grounded rule overrule a
  * grounded one, which bit viator-mcp where the projection intentionally keeps
  * a cover image. Media stripping is for the payloads that have no projection
- * to speak for them — here, the review and photo endpoints.
+ * to speak for them — here, `ta_get_location_reviews` and nothing else.
+ *
+ * NOT `ta_get_location_photos`, which is the other half of the same rule and
+ * the one that is easy to get wrong: a tool whose PRODUCT is the image URLs is
+ * not media-stripped either, because there the rule does not shrink the
+ * response, it empties it. So that tool registers no `view` at all — see the
+ * comment above its registrar. `viewResponse`'s no-projector branch is
+ * therefore reached by exactly one tool; it is a fallback, not dead code.
  *
  * No `raw` rung: `full` already returns the untouched upstream payload.
  */
