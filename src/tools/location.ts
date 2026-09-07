@@ -24,20 +24,33 @@ export function registerLocationTools(server: McpServer): void {
     },
   );
 
+  // `view` belongs here, and its rung is the SUBTRACTIVE one — not
+  // `compactLocation`, even though that projector reads exactly this shape.
+  // `compactLocation` answers with the row `ta_search_locations` already
+  // returned beside the id you looked up, so running it here would drop the
+  // descriptions, phone, opening hours and coordinates that are the entire
+  // reason to call the detail endpoint: a "compact" rung that removes the
+  // record's whole point is worse than none. What this payload actually
+  // carries incidentally is the rating-star `traveler_ratings.overall
+  // .icon_url`, which `stripMediaUrls` drops without collapsing anything —
+  // the same case as `ta_get_location_reviews` below. (chrischall#77.)
   server.registerTool(
     'ta_get_location_details',
     {
       description:
-        'Get full details for a TripAdvisor location: names, descriptions, address, coordinates, traveler ratings, phone, category, and listing URLs.',
+        'Get full details for a TripAdvisor location: names, descriptions, address, coordinates, traveler ratings, ' +
+        'phone, category, and listing URLs. Rating-icon and other incidental image URLs are dropped by default; ' +
+        'pass view:"full" for TripAdvisor\'s whole record.',
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {
         locationId: LocationId,
         locale: LocaleList,
+        view: viewArg(),
       },
     },
-    async ({ locationId, locale }) => {
+    async ({ locationId, locale, view }) => {
       const data = await client.get(`/locations/${locationId}${qs({ locale })}`, { cache: 'static' });
-      return minifiedResult(data);
+      return viewResponse(view, data);
     },
   );
 

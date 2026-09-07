@@ -86,10 +86,12 @@ so the host's install-time `tools/list` probe still succeeds.
 
 - **Path-injection guards.** `locationId` is a positive-int zod schema
   interpolated into the URL path; `category`/`unit`/`sort` are enums.
-- **`view` is per-tool, and FOUR of the eight tools deliberately don't take one.**
+- **`view` is per-tool, and THREE of the eight tools deliberately don't take one.**
   `ta_search_locations` / `ta_search_nearby` / `ta_get_locations` route through
-  a hand-written projector; `ta_get_location_reviews` has no projection, so its
-  compact rung is `stripMediaUrls` — avatars are incidental to review text.
+  a hand-written projector; `ta_get_location_reviews` and
+  `ta_get_location_details` have no projection to run, so their compact rung is
+  `stripMediaUrls` — avatars are incidental to review text, and the rating-star
+  `icon_url` is incidental to a detail record.
   `ta_get_location_photos` takes **no** `view`: its product IS the image URLs,
   and a photos item's whole payload hangs off the media key `photo`, so
   stripping would empty it rather than shrink it. `ta_web_get_location` takes
@@ -97,20 +99,26 @@ so the host's install-time `tools/list` probe still succeeds.
   down to named fields including a deliberate `image`, and media-stripping a
   grounded projection lets a blind rule overrule a grounded one (the
   viator-mcp `coverImageUrl` regression). Each carries a comment saying so.
-  The fourth, `ta_web_healthcheck`, reports a diagnosis rather than a record
+  The third, `ta_web_healthcheck`, reports a diagnosis rather than a record
   and has nothing to project.
 
-  **`ta_get_location_details` is the open one — not a settled exclusion.** #85
-  described it as deliberate on the reasoning that its compact rung would be
-  `compactLocation`, i.e. the same row `ta_search_locations` already returned
-  beside the id you looked it up with. That argues against *that projector*, not
-  against a rung: the raw `Location` object carries incidental media
-  (`traveler_ratings.overall.icon_url` among others) that a subtractive rung
-  would drop without collapsing the record. #77 had already filed this hours
-  earlier and is the live discussion; it also warns that if `compactLocation`
-  IS the right shape, wiring it is a grounded projection and must NOT then be
-  media-stripped — the blind rule deleted viator-mcp's deliberate
-  `coverImageUrl` that way (chrischall/viator-mcp#72).
+  **`ta_get_location_details` is settled now (#77), and it takes a `view`.** The
+  rung is the subtractive one. `compactLocation` reads exactly this shape — it
+  keys off `names`/`addresses`/`urls.tripadvisor.main`/`traveler_ratings.overall`,
+  which are detail-record keys — so it is tempting, and it is still the wrong
+  answer: it returns the row `ta_search_locations` already handed back beside the
+  id you looked up, dropping `descriptions`, `phone_numbers`, `opening_hours`,
+  `coordinates` and `recommended_visit_length`. A compact rung that removes the
+  reason the endpoint was called is worse than no rung. What the payload carries
+  incidentally is `traveler_ratings.overall.icon_url`, and `stripMediaUrls` drops
+  it without collapsing the record. #85 had earlier described the exclusion as
+  deliberate on the reasoning that the rung *would* be `compactLocation`; that
+  argued against the projector, never against a rung.
+
+  The converse still holds and is why this stayed open so long: had
+  `compactLocation` been right here, wiring it would have been a GROUNDED
+  projection and must not then be media-stripped — the blind rule deleted
+  viator-mcp's deliberate `coverImageUrl` that way (chrischall/viator-mcp#72).
 
   The count was wrong here before (it said "two" while naming two and omitting
   two), which is the same undercount that keeps catching this fleet: the tool

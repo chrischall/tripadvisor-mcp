@@ -5,6 +5,27 @@ import { registerLocationTools } from '../../src/tools/location.js';
 
 const mockGet = vi.spyOn(client, 'get').mockResolvedValue({});
 
+// A real `/locations/{id}` record, trimmed to the keys under test (captured
+// live against Terra; shape pinned in docs/TRIPADVISOR-API.md). The only media
+// this payload carries is the rating-star `icon_url`.
+const DETAILS = {
+  id: 188151,
+  geo: 'Paris',
+  names: [{ language: 'en', value: 'Eiffel Tower', primary: true }],
+  descriptions: [{ language: 'en', value: 'A colossal landmark.' }],
+  photos: { total_count: 107633 },
+  addresses: [{ street_address: 'Av. Gustave Eiffel', city: 'Paris', country_code: 'FR' }],
+  coordinates: { latitude: 48.858353, longitude: 2.294464 },
+  phone_numbers: [{ value: '+33 892 70 12 39', type: 'phone' }],
+  urls: { tripadvisor: { main: 'https://www.tripadvisor.com/Attraction_Review-g187147-d188151.html' } },
+  opening_hours: { periods: [{ day_of_week: 'Sunday', opens: '09:30', closes: '23:00' }], timezone: 'Europe/Paris' },
+  traveler_ratings: {
+    overall: { rating: 4.6, count: 144067, icon_url: 'https://www.tripadvisor.com/img/cdsi/img2/ratings/4.5.png' },
+    breakdowns: [{ count: 1513, rating: 1, rating_name: 'Terrible' }],
+  },
+  recommended_visit_length: 2,
+};
+
 let harness: Awaited<ReturnType<typeof createTestHarness>>;
 
 beforeEach(() => mockGet.mockClear());
@@ -54,6 +75,42 @@ describe('location tools (Terra)', () => {
     it('rejects a non-integer locationId', async () => {
       expect((await harness.callTool('ta_get_location_details', { locationId: 1.5 })).isError).toBe(true);
       expect(mockGet).not.toHaveBeenCalled();
+    });
+
+    // Same case as reviews, not as search: the caller asked for the DETAIL
+    // record, so `compactLocation` is the wrong rung here even though it reads
+    // exactly this shape — it would answer with the search row they already had
+    // beside the id, dropping description, phone, hours and coordinates, i.e.
+    // everything the detail endpoint exists to add. The incidental media is the
+    // rating-star `icon_url`, which a subtractive rung drops without collapsing
+    // the record. Fixture keys are from a live capture (docs/TRIPADVISOR-API.md).
+    it('strips the rating icon_url BY DEFAULT while keeping every detail field', async () => {
+      mockGet.mockResolvedValueOnce(DETAILS);
+      const text = ((await harness.callTool('ta_get_location_details', { locationId: 188151 })).content[0] as {
+        text: string;
+      }).text;
+      const out = JSON.parse(text);
+      expect(out.traveler_ratings.overall).toEqual({ rating: 4.6, count: 144067 });
+      // The fields that make this the DETAIL record all survive — this is the
+      // assertion that fails if someone reaches for `compactLocation` instead.
+      expect(out.descriptions[0].value).toBe('A colossal landmark.');
+      expect(out.phone_numbers[0].value).toBe('+33 892 70 12 39');
+      expect(out.coordinates).toEqual({ latitude: 48.858353, longitude: 2.294464 });
+      expect(out.opening_hours.timezone).toBe('Europe/Paris');
+      expect(text).not.toContain('icon_url');
+    });
+
+    it('returns the whole record on view:"full"', async () => {
+      mockGet.mockResolvedValueOnce(DETAILS);
+      const text = ((await harness.callTool('ta_get_location_details', { locationId: 188151, view: 'full' }))
+        .content[0] as { text: string }).text;
+      expect(JSON.parse(text)).toEqual(DETAILS);
+    });
+
+    // `view` is ours, not Terra's — leaking it into the query string would 400.
+    it('does not put view into the Terra query string', async () => {
+      await harness.callTool('ta_get_location_details', { locationId: 188151, view: 'full' });
+      expect(mockGet).toHaveBeenCalledWith('/locations/188151', { cache: 'static' });
     });
   });
 
