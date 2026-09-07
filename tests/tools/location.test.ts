@@ -97,6 +97,13 @@ describe('location tools (Terra)', () => {
       expect(out.phone_numbers[0].value).toBe('+33 892 70 12 39');
       expect(out.coordinates).toEqual({ latitude: 48.858353, longitude: 2.294464 });
       expect(out.opening_hours.timezone).toBe('Europe/Paris');
+      // `urls` is the one surviving key a media rule could plausibly reach for
+      // — it is a bag of links, and the tool description promises "listing
+      // URLs" on the default rung. A rung that ate them would still look
+      // healthy against every other assertion here.
+      expect(out.urls.tripadvisor.main).toBe(
+        'https://www.tripadvisor.com/Attraction_Review-g187147-d188151.html',
+      );
       expect(text).not.toContain('icon_url');
     });
 
