@@ -4,9 +4,6 @@
     ".": {
       "package-name": "@chrischall/tripadvisor-mcp",
       "release-type": "node",
-      "include-v-in-tag": true,
-      "include-component-in-tag": false,
-      "bump-minor-pre-major": true,
       "changelog-sections": [
         {
           "type": "feat",
@@ -85,7 +82,10 @@
           "jsonpath": "$.metadata.version"
         },
         "src/version.ts"
-      ]
+      ],
+      "bump-minor-pre-major": true,
+      "include-v-in-tag": true,
+      "include-component-in-tag": false
     }
   }
 }
