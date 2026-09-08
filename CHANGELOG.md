@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.5.1...v0.6.0) (2026-09-07)
+
+
+### Features
+
+* **location:** ta_get_location_details takes a view and drops the rating icon ([#90](https://github.com/chrischall/tripadvisor-mcp/issues/90)) ([8216155](https://github.com/chrischall/tripadvisor-mcp/commit/82161555228a4851911e7504d1a959c1cebed9b0)), closes [#77](https://github.com/chrischall/tripadvisor-mcp/issues/77)
+
 ## [0.5.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.5.0...v0.5.1) (2026-09-04)
 
 
