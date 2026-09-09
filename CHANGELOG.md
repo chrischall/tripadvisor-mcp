@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.0...v0.6.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* **deps:** bump hono from 4.13.1 to 4.13.7 ([#100](https://github.com/chrischall/tripadvisor-mcp/issues/100)) ([84cc326](https://github.com/chrischall/tripadvisor-mcp/commit/84cc3262a1d9d339788e64c1c7e7e03dad4b252f))
+* **deps:** require @fetchproxy/server ^2.7.0, the first that reads FETCHPROXY_IDENTITY_DIR ([#98](https://github.com/chrischall/tripadvisor-mcp/issues/98)) ([9a92043](https://github.com/chrischall/tripadvisor-mcp/commit/9a92043f2485050c370dc6acd02ffc7123952ff8))
+
 ## [0.6.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.5.1...v0.6.0) (2026-09-07)
 
 
