@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.2](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.1...v0.6.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 2.10.0 and @chrischall/mcp-utils 0.26.1 ([#103](https://github.com/chrischall/tripadvisor-mcp/issues/103)) ([0c593e8](https://github.com/chrischall/tripadvisor-mcp/commit/0c593e8c68dafd3bd77ad65180b41cf4760c777c))
+* **deps:** declare the peer floors mcp-utils 0.26.1 requires ([#105](https://github.com/chrischall/tripadvisor-mcp/issues/105)) ([22346c6](https://github.com/chrischall/tripadvisor-mcp/commit/22346c6b0d90628e6d866c34309dcc9a95d41e82)), closes [#104](https://github.com/chrischall/tripadvisor-mcp/issues/104)
+* **deps:** take @fetchproxy/server 2.9.1 so a pairing prompt survives ([#101](https://github.com/chrischall/tripadvisor-mcp/issues/101)) ([6d73c1c](https://github.com/chrischall/tripadvisor-mcp/commit/6d73c1cf037ff933da90001367681bf1f096e517))
+
 ## [0.6.1](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.0...v0.6.1) (2026-09-09)
 
 
