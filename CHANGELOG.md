@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.3](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.2...v0.6.3) (2026-09-14)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 2.11.3, so the hosted extension pin persists ([#107](https://github.com/chrischall/tripadvisor-mcp/issues/107)) ([91c0bd0](https://github.com/chrischall/tripadvisor-mcp/commit/91c0bd083fb672ad843de75f5db321f83cd8b4e2))
+* **deps:** @fetchproxy/server 3.0.0 — protocol v4 (forward secrecy, AAD over the frame) ([#110](https://github.com/chrischall/tripadvisor-mcp/issues/110)) ([66266fb](https://github.com/chrischall/tripadvisor-mcp/commit/66266fbe7324523015c437042afaa3cd87ab8f7c))
+
 ## [0.6.2](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.1...v0.6.2) (2026-09-10)
 
 
