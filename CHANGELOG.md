@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.4](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.3...v0.6.4) (2026-09-15)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 3.0.1 — capped peer frames, logged load drops, atomic identity writes ([#111](https://github.com/chrischall/tripadvisor-mcp/issues/111)) ([c195d6f](https://github.com/chrischall/tripadvisor-mcp/commit/c195d6fed14bb34114e29f1a9f9d27ac5af292fc))
+
 ## [0.6.3](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.2...v0.6.3) (2026-09-14)
 
 
