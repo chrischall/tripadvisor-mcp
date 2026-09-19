@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.0.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.4...v1.0.0) (2026-09-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mcp:** migrate server to SDK v2 ([#118](https://github.com/chrischall/tripadvisor-mcp/issues/118))
+
+### Features
+
+* **mcp:** migrate server to SDK v2 ([#118](https://github.com/chrischall/tripadvisor-mcp/issues/118)) ([d42530b](https://github.com/chrischall/tripadvisor-mcp/commit/d42530b09dfead0a89ab1efe1a847ab7ff000211))
+
+
+### Bug Fixes
+
+* **deps:** bump the production-dependencies group with 2 updates ([#116](https://github.com/chrischall/tripadvisor-mcp/issues/116)) ([c5247ff](https://github.com/chrischall/tripadvisor-mcp/commit/c5247ffcf86bc58193b190ccd1a2e4a3afc78f43))
+
 ## [0.6.4](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.3...v0.6.4) (2026-09-15)
 
 
