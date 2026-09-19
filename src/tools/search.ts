@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { McpToolError } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
 import { Category, LocaleList, pageParams, qs } from './shared.js';
@@ -15,7 +15,7 @@ export function registerSearchTools(server: McpServer): void {
       description:
         'Search TripAdvisor locations (restaurants, attractions, hotels) by name. Returns matches with a location id for the detail tools, plus pagination. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         query: z.string().min(1).max(500).describe('Text to search location names for'),
         category: Category.optional().describe('Restrict to one category'),
         country_code: z.string().length(2).optional().describe('Alpha-2 country code (e.g. "US")'),
@@ -24,7 +24,7 @@ export function registerSearchTools(server: McpServer): void {
         locale: LocaleList,
         ...pageParams,
         ...viewParamShared,
-      },
+      }),
     },
     async ({ query, category, country_code, geo_name, postal_code, locale, page, size, view }) => {
       const data = await client.get(
@@ -41,7 +41,7 @@ export function registerSearchTools(server: McpServer): void {
       description:
         'Find TripAdvisor locations near a point within a radius, or inside a bounding box. Center by lat+lon+radius, by a reference location_id+radius, or by a sw/ne bounding box. Returns matches with distance and a location id. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         // Center — supply exactly one of: lat+lon, location_id, or the sw/ne box.
         lat: z.number().min(-90).max(90).optional().describe('Center latitude (with lon+radius)'),
         lon: z.number().min(-180).max(180).optional().describe('Center longitude (with lat+radius)'),
@@ -59,7 +59,7 @@ export function registerSearchTools(server: McpServer): void {
         locale: LocaleList,
         ...pageParams,
         ...viewParamShared,
-      },
+      }),
     },
     async (args) => {
       const { lat, lon, location_id, radius, sw_lat, sw_lon, ne_lat, ne_lon, view, ...rest } = args;
