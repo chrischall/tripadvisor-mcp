@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
 import { LocationId, LocaleList, pageParams, qs } from './shared.js';
@@ -12,11 +12,11 @@ export function registerLocationTools(server: McpServer): void {
       description:
         'Get details for MULTIPLE locations in one call (batch). Pass an array of location ids — cheaper than repeated ta_get_location_details. Unknown or unlicensed ids are silently omitted. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         ids: z.array(LocationId).min(1).max(50).describe('Location IDs to fetch (1–50)'),
         locale: LocaleList,
         view: viewArg(),
-      },
+      }),
     },
     async ({ ids, locale, view }) => {
       const data = await client.get(`/locations${qs({ id: ids, locale })}`, { cache: 'static' });
@@ -42,11 +42,11 @@ export function registerLocationTools(server: McpServer): void {
         'phone, category, and listing URLs. Rating-icon and other incidental image URLs are dropped by default; ' +
         'pass view:"full" for TripAdvisor\'s whole record.',
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         locationId: LocationId,
         locale: LocaleList,
         view: viewArg(),
-      },
+      }),
     },
     async ({ locationId, locale, view }) => {
       const data = await client.get(`/locations/${locationId}${qs({ locale })}`, { cache: 'static' });
@@ -67,11 +67,11 @@ export function registerLocationTools(server: McpServer): void {
     {
       description: 'Get photos for a TripAdvisor location (multi-size image URLs, source, dimensions), with pagination.',
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         locationId: LocationId,
         locale: LocaleList,
         ...pageParams,
-      },
+      }),
     },
     async ({ locationId, locale, page, size }) => {
       const data = await client.get(`/locations/${locationId}/photos${qs({ locale, page, size })}`, {
@@ -94,12 +94,12 @@ export function registerLocationTools(server: McpServer): void {
         'Get traveler reviews for a TripAdvisor location, with pagination. Reviewer avatars and other image URLs ' +
         'are dropped by default; pass view:"full" for TripAdvisor\'s whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         locationId: LocationId,
         locale: LocaleList,
         ...pageParams,
         view: viewArg(),
-      },
+      }),
     },
     async ({ locationId, locale, page, size, view }) => {
       const data = await client.get(`/locations/${locationId}/reviews${qs({ locale, page, size })}`, {
