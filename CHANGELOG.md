@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/chrischall/tripadvisor-mcp/compare/v1.0.0...v1.1.0) (2026-09-19)
+
+
+### Features
+
+* **deps:** take mcp-utils 1.0.0, boot through serveStdio ([#123](https://github.com/chrischall/tripadvisor-mcp/issues/123)) ([8bbf351](https://github.com/chrischall/tripadvisor-mcp/commit/8bbf351a04c38ae1080a92b14b9b2792b173e025))
+
+
+### Documentation
+
+* **view:** name both tools that reach the stripMediaUrls rung ([#121](https://github.com/chrischall/tripadvisor-mcp/issues/121)) ([cb5c940](https://github.com/chrischall/tripadvisor-mcp/commit/cb5c940aa20339d1b54bec96c6cc1d2ea9b807fa)), closes [#119](https://github.com/chrischall/tripadvisor-mcp/issues/119)
+
 ## [1.0.0](https://github.com/chrischall/tripadvisor-mcp/compare/v0.6.4...v1.0.0) (2026-09-19)
 
 
