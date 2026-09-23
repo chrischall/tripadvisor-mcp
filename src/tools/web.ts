@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { registerBridgeHealthcheckTool } from '@chrischall/mcp-utils/fetchproxy';
 import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
 import { webClient } from '../web/client.js';
-import { parseLocationDetail } from '../web/parse.js';
+import { LocationMismatchError, parseLocationDetail } from '../web/parse.js';
 import { LocationId } from './shared.js';
 
 /**
@@ -53,7 +53,18 @@ export function registerWebTools(server: McpServer): void {
     },
     async ({ locationId }) => {
       const html = await webClient.getLocationHtml(locationId);
-      const detail = parseLocationDetail(html);
+      let detail;
+      try {
+        detail = parseLocationDetail(html, locationId);
+      } catch (err) {
+        if (!(err instanceof LocationMismatchError)) throw err;
+        throw new McpToolError(
+          `Location ${locationId} resolved to a different TripAdvisor listing (d${err.foundId}), so its details were not returned.`,
+          {
+            hint: `The id may be a geo id, or a removed or merged listing. Use ta_web_get_location with ${err.foundId} if that listing is the one you want, or re-find the place with ta_search_locations.`,
+          },
+        );
+      }
       if (!detail) {
         throw new McpToolError(`Could not parse location ${locationId} from its TripAdvisor page.`, {
           hint: 'The page may be a bot-challenge shell or the id may be wrong — run ta_web_healthcheck and confirm a signed-in www.tripadvisor.com tab is open, then retry.',

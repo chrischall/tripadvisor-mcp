@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseLocationDetail, locationDetailPath } from '../../src/web/parse.js';
+import { parseLocationDetail, locationDetailPath, LocationMismatchError } from '../../src/web/parse.js';
 
 // Minimal fixtures mirroring the real captured ld+json (values from live recon,
 // see docs/TRIPADVISOR-WEB-API.md). The business node is the one carrying both
@@ -73,5 +73,47 @@ describe('parseLocationDetail', () => {
     expect(d.name).toBe('X');
     expect(d).not.toHaveProperty('telephone');
     expect(d).not.toHaveProperty('latitude');
+  });
+
+  it('accepts a zero-review listing (business @type, no aggregateRating) and omits the rating', () => {
+    const { aggregateRating: _drop, ...noReviews } = { ...attraction, '@type': 'LodgingBusiness', name: 'Brand New Inn' };
+    const d = parseLocationDetail(page(JSON.stringify(noReviews)), 104675);
+    expect(d).toMatchObject({ type: 'LodgingBusiness', name: 'Brand New Inn', telephone: '+1 415-921-5858' });
+    expect(d).not.toHaveProperty('rating');
+    expect(d).not.toHaveProperty('review_count');
+  });
+
+  it('does not mistake a named non-business node (Organization/WebSite) for the listing', () => {
+    const html = `<script type="application/ld+json">${JSON.stringify({ '@type': 'Organization', name: 'Tripadvisor' })}</script>
+<script type="application/ld+json">${JSON.stringify({ '@type': 'WebSite', name: 'Tripadvisor', url: 'https://www.tripadvisor.com/' })}</script>`;
+    expect(parseLocationDetail(html, 104675)).toBeNull();
+  });
+
+  it('prefers the node whose url/@id carries the requested d-id over an earlier rated node', () => {
+    const other = { ...attraction, name: 'Some Other Place', url: 'https://www.tripadvisor.com/Attraction_Review-g60713-d999-Reviews-x.html', '@id': '/Attraction_Review-g60713-d999-Reviews-x.html' };
+    const html = `<script type="application/ld+json">${JSON.stringify(other)}</script>${page(JSON.stringify(attraction))}`;
+    expect(parseLocationDetail(html, 104675)?.name).toBe('Golden Gate Bridge');
+  });
+
+  it('matches on @id when url is absent', () => {
+    const { url: _u, ...noUrl } = { ...attraction, '@id': '/Attraction_Review-g60713-d104675-Reviews-x.html' };
+    expect(parseLocationDetail(page(JSON.stringify(noUrl)), 104675)?.name).toBe('Golden Gate Bridge');
+  });
+
+  it('throws LocationMismatchError when the page is a different listing (redirected geo / merged / removed id)', () => {
+    let err: unknown;
+    try {
+      parseLocationDetail(page(JSON.stringify(attraction)), 60713);
+    } catch (e) {
+      err = e;
+    }
+    expect(err).toBeInstanceOf(LocationMismatchError);
+    expect((err as LocationMismatchError).foundId).toBe(104675);
+    expect((err as LocationMismatchError).requestedId).toBe(60713);
+  });
+
+  it('accepts a node that carries no listing id at all (cannot be verified, not contradicted)', () => {
+    const { url: _u, ...noUrl } = attraction;
+    expect(parseLocationDetail(page(JSON.stringify(noUrl)), 60713)?.name).toBe('Golden Gate Bridge');
   });
 });
