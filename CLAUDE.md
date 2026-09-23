@@ -75,7 +75,8 @@ so the host's install-time `tools/list` probe still succeeds.
 - `src/web/{transport,client,config}.ts` — the fetchproxy bridge tier
   (transport on port 37149, generic web client with bot-wall guards, config).
 - `src/web/parse.ts` — pure ld+json → `LocationDetail` projection (unit-tested
-  against captured bytes; the business node is the one with name+aggregateRating).
+  against captured bytes; the business node is the named, rated-or-business-typed
+  one matching the requested `d<id>` — a different listing is an error, not a result).
 - `src/index.ts` — wires the registrars via `runMcp`; version from
   `src/version.ts` (single release-please-managed source).
 - `docs/TRIPADVISOR-API.md` — Terra request/response shapes, captured live.

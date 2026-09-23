@@ -45,8 +45,13 @@ resolves correctly to attraction **and** hotel (`d93520`) **and** restaurant (`d
 GET /Attraction_Review-g1-d<locationId>-Reviews-x-y.html
 ```
 
-**Parsing:** the page embeds 3 `application/ld+json` blocks. The business node is the one with
-both `name` and `aggregateRating`; its `@type` varies by category but the shape is identical:
+**Parsing:** the page embeds 3 `application/ld+json` blocks. The business node is the named one
+that is rated (`aggregateRating`), business-typed (below), or whose `url`/`@id` carries a
+`-d<id>-` listing segment — a listing with no reviews has no `aggregateRating`, so the rating is
+not required. The node whose `url`/`@id` matches the requested `d<id>` wins; if the page resolved
+to a *different* listing (a geo id, a removed or merged listing redirecting elsewhere) the tool
+errors rather than attributing that listing's data to the requested id. Its `@type` varies by
+category but the shape is identical:
 
 | `@type` | Category |
 | --- | --- |

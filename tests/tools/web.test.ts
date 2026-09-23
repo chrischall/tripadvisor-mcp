@@ -51,4 +51,22 @@ describe('ta_web_get_location', () => {
     expect(result.isError).toBe(true);
     expect((result.content[0] as { text: string }).text).toMatch(/could not parse/i);
   });
+
+  it('passes the requested id to the parser and errors on a different listing instead of mislabelling it', async () => {
+    mockGetLocationHtml.mockResolvedValueOnce(businessHtml());
+    const result = await harness.callTool('ta_web_get_location', { locationId: 60713 });
+    expect(result.isError).toBe(true);
+    const text = (result.content[0] as { text: string }).text;
+    expect(text).toMatch(/d104675/);
+    expect(text).not.toMatch(/ta_web_healthcheck/);
+  });
+
+  it('returns a zero-review listing without a rating instead of a bot-challenge error', async () => {
+    mockGetLocationHtml.mockResolvedValueOnce(businessHtml({ aggregateRating: undefined }));
+    const result = await harness.callTool('ta_web_get_location', { locationId: 104675 });
+    expect(result.isError).toBeFalsy();
+    const text = (result.content[0] as { text: string }).text;
+    expect(text).toContain('"name":"Golden Gate Bridge"');
+    expect(text).not.toContain('"rating"');
+  });
 });

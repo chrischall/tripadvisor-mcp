@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "tripadvisor": {
-      "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@chrischall/tripadvisor-mcp"],
       "env": {
         "TRIPADVISOR_API_KEY": "${TRIPADVISOR_API_KEY}",
         "TRIPADVISOR_CACHE_TTL": "${TRIPADVISOR_CACHE_TTL}",

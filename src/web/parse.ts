@@ -50,19 +50,80 @@ function num(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+/** schema.org `@type`s TripAdvisor uses for a listing's business node (see docs/TRIPADVISOR-WEB-API.md). */
+const BUSINESS_TYPES = new Set([
+  'LocalBusiness',
+  'LodgingBusiness',
+  'FoodEstablishment',
+  'Restaurant',
+  'Hotel',
+  'TouristAttraction',
+]);
+
+/** The listing `d`-id a node's `url` / `@id` points at (`…-d<id>-…`), or undefined. */
+function nodeListingId(node: Record<string, unknown>): number | undefined {
+  for (const ref of [node.url, node['@id']]) {
+    if (typeof ref !== 'string') continue;
+    const m = /-d(\d+)-/.exec(ref);
+    if (m) return Number(m[1]);
+  }
+  return undefined;
+}
+
+/**
+ * A listing's business node: named, and either rated, typed as a business, or
+ * pointing at a `-d<id>-` listing URL. A brand-new listing has no reviews and so
+ * no `aggregateRating`, but is still a listing — requiring the rating would
+ * misreport it as a bot-challenge shell. Site-wide `Organization`/`WebSite`
+ * nodes carry a name too, but none of the other three.
+ */
+function isBusinessNode(b: unknown): b is Record<string, unknown> {
+  if (typeof b !== 'object' || b === null) return false;
+  const node = b as Record<string, unknown>;
+  if (typeof node.name !== 'string') return false;
+  const type = node['@type'];
+  return (
+    'aggregateRating' in node ||
+    (typeof type === 'string' && BUSINESS_TYPES.has(type)) ||
+    nodeListingId(node) !== undefined
+  );
+}
+
+/**
+ * Thrown when the page resolved to a different listing than the one requested —
+ * e.g. a geo (`g`) id, a removed listing, or a merged duplicate that TripAdvisor
+ * redirects elsewhere. Returning that page's detail under the requested id would
+ * attribute another business's rating/address/phone to it.
+ */
+export class LocationMismatchError extends Error {
+  constructor(
+    readonly requestedId: number,
+    readonly foundId: number,
+  ) {
+    super(`TripAdvisor served listing d${foundId}, not the requested d${requestedId}.`);
+    this.name = 'LocationMismatchError';
+  }
+}
+
 /**
  * Parse a location detail page into a {@link LocationDetail}. The business node
- * is the ld+json block carrying both `name` and `aggregateRating` (its `@type`
- * varies by category but the shape is identical). Returns null when no such node
- * is present — a hydrated shell or a bot-challenge page — so the caller can throw
- * an actionable error instead of emitting an empty projection.
+ * is picked by {@link isBusinessNode} (its `@type` varies by category but the
+ * shape is identical). When `locationId` is given, the node whose `url`/`@id`
+ * carries `-d<locationId>-` wins; if the chosen node names a different listing,
+ * {@link LocationMismatchError} is thrown. Returns null when no business node is
+ * present — a hydrated shell or a bot-challenge page — so the caller can throw
+ * an actionable error instead of emitting an empty projection. A listing with no
+ * reviews parses fine; its rating fields are simply absent.
  */
-export function parseLocationDetail(html: string): LocationDetail | null {
-  const node = ldJsonBlocks(html).find(
-    (b): b is Record<string, unknown> =>
-      typeof b === 'object' && b !== null && typeof (b as Record<string, unknown>).name === 'string' && 'aggregateRating' in b,
-  );
+export function parseLocationDetail(html: string, locationId?: number): LocationDetail | null {
+  const candidates = ldJsonBlocks(html).filter(isBusinessNode);
+  const node =
+    (locationId !== undefined ? candidates.find((c) => nodeListingId(c) === locationId) : undefined) ?? candidates[0];
   if (!node) return null;
+  if (locationId !== undefined) {
+    const foundId = nodeListingId(node);
+    if (foundId !== undefined && foundId !== locationId) throw new LocationMismatchError(locationId, foundId);
+  }
 
   const rating = (node.aggregateRating ?? {}) as Record<string, unknown>;
   const geo = (node.geo ?? {}) as Record<string, unknown>;
