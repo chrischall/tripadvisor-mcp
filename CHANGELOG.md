@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.0...v1.1.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **deps:** require zod ^4.6.5 to match @chrischall/mcp-utils 2.4.0 ([#127](https://github.com/chrischall/tripadvisor-mcp/issues/127)) ([85a52ef](https://github.com/chrischall/tripadvisor-mcp/commit/85a52ef42ecba368c465eee60885d834888f358b))
+* **deps:** upgrade @chrischall/mcp-utils to 2.4.0 and @fetchproxy/* to 3.2.0 ([#125](https://github.com/chrischall/tripadvisor-mcp/issues/125)) ([6357faa](https://github.com/chrischall/tripadvisor-mcp/commit/6357faa2adc642af397b52be8227fee1a6f00357))
+
 ## [1.1.0](https://github.com/chrischall/tripadvisor-mcp/compare/v1.0.0...v1.1.0) (2026-09-19)
 
 
