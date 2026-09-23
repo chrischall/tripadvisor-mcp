@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.1...v1.1.2) (2026-09-23)
+
+
+### Bug Fixes
+
+* stop ta_web_get_location returning the wrong listing or failing on unreviewed ones, and fix the plugin's server launch ([#128](https://github.com/chrischall/tripadvisor-mcp/issues/128)) ([ea8c391](https://github.com/chrischall/tripadvisor-mcp/commit/ea8c391a2c1e241e97e126700660744da0a33cbe))
+
 ## [1.1.1](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.0...v1.1.1) (2026-09-23)
 
 
