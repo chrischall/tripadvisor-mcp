@@ -116,4 +116,16 @@ describe('parseLocationDetail', () => {
     const { url: _u, ...noUrl } = attraction;
     expect(parseLocationDetail(page(JSON.stringify(noUrl)), 60713)?.name).toBe('Golden Gate Bridge');
   });
+
+  it('parses a hostile flood of unterminated <script openers in linear time (no ReDoS)', () => {
+    // A MITM'd / bot-wall body: many `<script` openers and no `>`. The old
+    // `<script[^>]*…` regex rescanned to end-of-input per opener — O(n^2) (~1 s for
+    // the bare flood, worse still once each opener carries the ld+json type) —
+    // pinning the single-threaded stdio server. indexOf-driven scanning is ms.
+    for (const hostile of ['<script '.repeat(16_000), '<script type="application/ld+json" '.repeat(600)]) {
+      const started = performance.now();
+      expect(parseLocationDetail(hostile)).toBeNull();
+      expect(performance.now() - started).toBeLessThan(250);
+    }
+  });
 });
