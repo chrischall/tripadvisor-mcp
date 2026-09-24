@@ -1,6 +1,10 @@
 // Pure parsing for the web tier — no bridge, no I/O, so it's unit-testable
 // against captured bytes. Shapes pinned in docs/TRIPADVISOR-WEB-API.md.
 
+// Linear-time (indexOf-driven) ld+json extraction. A `<script[^>]*…` regex here
+// backtracked quadratically on a hostile flood of unterminated `<script` openers.
+import { extractJsonLdBlocks } from '@chrischall/mcp-utils/scrape';
+
 /** A location's structured detail, projected from the page's schema.org ld+json. */
 export interface LocationDetail {
   /** schema.org type: LocalBusiness (attraction) | LodgingBusiness (hotel) | FoodEstablishment (restaurant). */
@@ -28,19 +32,6 @@ export interface LocationDetail {
  */
 export function locationDetailPath(locationId: number): string {
   return `/Attraction_Review-g1-d${locationId}-Reviews-a-a.html`;
-}
-
-/** Extract every `application/ld+json` block's parsed JSON (skipping malformed ones). */
-function ldJsonBlocks(html: string): unknown[] {
-  const out: unknown[] = [];
-  for (const m of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
-    try {
-      out.push(JSON.parse(m[1].trim()));
-    } catch {
-      // Undocumented markup can carry a malformed block; skip it and keep scanning.
-    }
-  }
-  return out;
 }
 
 /** Coerce a schema.org string|number to a finite number, or undefined. */
@@ -116,7 +107,7 @@ export class LocationMismatchError extends Error {
  * reviews parses fine; its rating fields are simply absent.
  */
 export function parseLocationDetail(html: string, locationId?: number): LocationDetail | null {
-  const candidates = ldJsonBlocks(html).filter(isBusinessNode);
+  const candidates = extractJsonLdBlocks(html).filter(isBusinessNode);
   const node =
     (locationId !== undefined ? candidates.find((c) => nodeListingId(c) === locationId) : undefined) ?? candidates[0];
   if (!node) return null;
