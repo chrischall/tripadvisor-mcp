@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.3](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.2...v1.1.3) (2026-09-24)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv in the production-majors group ([#132](https://github.com/chrischall/tripadvisor-mcp/issues/132)) ([f76672e](https://github.com/chrischall/tripadvisor-mcp/commit/f76672e9cabeb0b5d60e9678f77c23fa86b35997))
+* **web:** stop hostile pages from stalling ta_web_get_location ([#134](https://github.com/chrischall/tripadvisor-mcp/issues/134)) ([cc6b359](https://github.com/chrischall/tripadvisor-mcp/commit/cc6b359057082be900948714081bc3bee3b2605f))
+
 ## [1.1.2](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.1...v1.1.2) (2026-09-23)
 
 
