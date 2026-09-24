@@ -77,6 +77,8 @@ so the host's install-time `tools/list` probe still succeeds.
 - `src/web/parse.ts` — pure ld+json → `LocationDetail` projection (unit-tested
   against captured bytes; the business node is the named, rated-or-business-typed
   one matching the requested `d<id>` — a different listing is an error, not a result).
+  Blocks come from mcp-utils' linear `extractJsonLdBlocks` — never a
+  `<script[^>]*…` regex, which backtracks quadratically on hostile HTML.
 - `src/index.ts` — wires the registrars via `runMcp`; version from
   `src/version.ts` (single release-please-managed source).
 - `docs/TRIPADVISOR-API.md` — Terra request/response shapes, captured live.
