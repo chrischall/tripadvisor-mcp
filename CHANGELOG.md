@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.3...v1.1.4) (2026-09-26)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv in the production-dependencies group ([#135](https://github.com/chrischall/tripadvisor-mcp/issues/135)) ([ef1e21b](https://github.com/chrischall/tripadvisor-mcp/commit/ef1e21b81e226d81f5cbcf9d7e361d7a1dbab05d))
+
 ## [1.1.3](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.2...v1.1.3) (2026-09-24)
 
 
