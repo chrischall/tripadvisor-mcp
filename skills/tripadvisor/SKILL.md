@@ -58,7 +58,7 @@ npm install && npm run build
 | `ta_get_locations` | Batch details for **multiple** ids (`ids: [..]`, 1–50) in one call — cheaper than repeated details; unknown ids are omitted. |
 | `ta_get_location_photos` | Photos (multi-size URLs, source, dimensions). Page with `page`/`size`. |
 | `ta_get_location_reviews` | Traveler reviews. Page with `page`/`size`. |
-| `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (fetchproxy Transporter). Reports bridge role/port/timing and an actionable hint if it's not connected. |
+| `ta_web_healthcheck` | Diagnose the optional tripadvisor.com browser-bridge connection (ContextMint Bridge extension). Reports bridge role/port/timing and an actionable hint if it's not connected. |
 | `ta_web_get_location` | Get a location's details (rating, review count, address, coordinates, phone, photo, URL) from its public TripAdvisor page via the browser bridge — **works without an API key**. Covers attractions/hotels/restaurants; no individual review text. |
 
 ## Response shape
