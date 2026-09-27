@@ -108,8 +108,8 @@ fpx pair -p tripadvisor                              # prints a pair code → ap
 
 Requires the **ContextMint Bridge** extension
 ([releases](https://github.com/nullnet-app/contextmint-bridge/releases) —
-Chrome: load the chrome zip unpacked; Safari: ships inside the ContextMint app)
-with an open `www.tripadvisor.com` tab. This covers attractions, hotels, and restaurants — it does **not**
+Chrome: load the chrome zip unpacked; Safari isn't available yet, so use Chrome for now)
+with an open `www.tripadvisor.com` tab. ContextMint Bridge is the fetchproxy extension renamed, same maintainer; source at https://github.com/nullnet-app/contextmint-bridge — build it or verify the release zip with `shasum -a 256 -c contextmint-bridge-chrome-<version>.zip.sha256`. This covers attractions, hotels, and restaurants — it does **not**
 return individual review text (only the aggregate rating/count). Fetch +
 parse recipe: `references/web-fallback.md`.
 

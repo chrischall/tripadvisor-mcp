@@ -45,9 +45,17 @@ routing same-origin fetches through your signed-in browser tab via the
 ContextMint Bridge browser extension, installed from
 [its releases page](https://github.com/nullnet-app/contextmint-bridge/releases)
 (Chrome: download the chrome zip and load it unpacked from `chrome://extensions`
-with Developer mode on; Safari: it ships inside the ContextMint app). It needs
+with Developer mode on; Safari isn't available yet — it will ship inside the
+ContextMint app, which has no public download — so use Chrome for now). It needs
 the extension installed and a one-time pairing approval; the Content API tools
 above never touch the bridge.
+
+ContextMint Bridge is the fetchproxy browser extension under its new name, from
+the same maintainer — fetchproxy's own README
+(<https://github.com/chrischall/fetchproxy#extension>) points to it. Its source is
+public at <https://github.com/nullnet-app/contextmint-bridge>: build it yourself,
+or check a release zip against the `.sha256` file published beside it
+(`shasum -a 256 -c contextmint-bridge-chrome-<version>.zip.sha256`).
 
 `ta_web_get_location` uses this bridge to read a location's details straight
 from its public TripAdvisor page — so it works **without an API key**,
