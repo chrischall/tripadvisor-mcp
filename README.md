@@ -42,9 +42,12 @@ All tools are read-only — Terra has no write endpoints.
 `ta_web_healthcheck` is the first tool of an optional second tier that reaches
 tripadvisor.com's consumer site (bot-walled, so unreachable server-side) by
 routing same-origin fetches through your signed-in browser tab via the
-[fetchproxy](https://github.com/chrischall/fetchproxy) Transporter extension.
-It needs the extension installed and a one-time pairing approval; the Content
-API tools above never touch the bridge.
+ContextMint Bridge browser extension, installed from
+[its releases page](https://github.com/nullnet-app/contextmint-bridge/releases)
+(Chrome: download the chrome zip and load it unpacked from `chrome://extensions`
+with Developer mode on; Safari: it ships inside the ContextMint app). It needs
+the extension installed and a one-time pairing approval; the Content API tools
+above never touch the bridge.
 
 `ta_web_get_location` uses this bridge to read a location's details straight
 from its public TripAdvisor page — so it works **without an API key**,

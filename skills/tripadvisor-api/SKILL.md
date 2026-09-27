@@ -103,11 +103,13 @@ want to use) a Terra key, or `ta_get_location_details` is blocked.
 ```sh
 npm install -g @fetchproxy/cli                      # provides `fpx`
 fpx profile add tripadvisor --domain tripadvisor.com # fetch capability only
-fpx pair -p tripadvisor                              # prints a pair code → approve in Transporter
+fpx pair -p tripadvisor                              # prints a pair code → approve in ContextMint Bridge
 ```
 
-Requires the **Transporter** extension with an open `www.tripadvisor.com`
-tab. This covers attractions, hotels, and restaurants — it does **not**
+Requires the **ContextMint Bridge** extension
+([releases](https://github.com/nullnet-app/contextmint-bridge/releases) —
+Chrome: load the chrome zip unpacked; Safari: ships inside the ContextMint app)
+with an open `www.tripadvisor.com` tab. This covers attractions, hotels, and restaurants — it does **not**
 return individual review text (only the aggregate rating/count). Fetch +
 parse recipe: `references/web-fallback.md`.
 

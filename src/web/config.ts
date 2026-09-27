@@ -1,7 +1,7 @@
 import { parseBoolEnv, readEnvVar, readPortEnv } from '@chrischall/mcp-utils';
 
-// The whole fetchproxy fleet shares ONE concentrator port — the Transporter
-// extension dials it, and servers host/peer-elect on it. Never default to a
+// The whole fetchproxy fleet shares ONE concentrator port — the ContextMint
+// Bridge extension dials it, and servers host/peer-elect on it. Never default to a
 // "unique" port; override only for test isolation.
 const DEFAULT_WS_PORT = 37_149;
 
