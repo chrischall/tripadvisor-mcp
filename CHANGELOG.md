@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.4](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.3...v1.1.4) (2026-09-27)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv in the production-dependencies group ([#135](https://github.com/chrischall/tripadvisor-mcp/issues/135)) ([ef1e21b](https://github.com/chrischall/tripadvisor-mcp/commit/ef1e21b81e226d81f5cbcf9d7e361d7a1dbab05d))
+* **deps:** move to [@fetchproxy](https://github.com/fetchproxy) 3.4 for ContextMint Bridge errors, capability subsets and managed pins ([#137](https://github.com/chrischall/tripadvisor-mcp/issues/137)) ([66b69e1](https://github.com/chrischall/tripadvisor-mcp/commit/66b69e19098fe312d8c35110078227cd49fd416d))
+* **deps:** move to @chrischall/mcp-utils 2.8 and [@fetchproxy](https://github.com/fetchproxy) 3.4.1 for clearer browser-bridge errors ([#138](https://github.com/chrischall/tripadvisor-mcp/issues/138)) ([8cbb331](https://github.com/chrischall/tripadvisor-mcp/commit/8cbb3314539c13fb8ac991727e89a4d03bc93fdc))
+
 ## [1.1.3](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.2...v1.1.3) (2026-09-24)
 
 
