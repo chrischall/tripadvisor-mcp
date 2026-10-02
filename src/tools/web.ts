@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import { registerBridgeHealthcheckTool } from '@chrischall/mcp-utils/fetchproxy';
-import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
+import { EdgeBlockedError, McpToolError, minifiedResult } from '@chrischall/mcp-utils';
 import { webClient } from '../web/client.js';
 import { LocationMismatchError, parseLocationDetail } from '../web/parse.js';
 import { LocationId } from './shared.js';
@@ -31,6 +31,13 @@ export function registerWebTools(server: McpServer): void {
       status: () => webClient.bridge().status(),
     },
     probeFn: (path) => webClient.getHtml(path),
+    // The web client wraps a bot wall / CDN refusal page in an McpToolError
+    // (for its hint) with the typed EdgeBlockedError as `cause`; name it by
+    // the shared arm so a block is never reported as an unknown failure.
+    classifyThrown: (err) =>
+      err instanceof Error && err.cause instanceof EdgeBlockedError
+        ? { kind: 'edge_blocked', detail: { vendor: err.cause.vendor } }
+        : undefined,
   });
 
   // NO `view` on this tool, deliberately, and for the OPPOSITE reason to
