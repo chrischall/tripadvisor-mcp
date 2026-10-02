@@ -46,9 +46,12 @@ TRIPADVISOR_WS_PORT=<port>           # Optional, tests only. Bridge port overrid
 `client.get(path, { cache })` is backed by an in-memory cache keyed by the
 path, with two TTL tiers to stretch the Discover tier's 10,000-calls/day quota:
 **dynamic** (default 300s) for the two search tools, **static** (default
-3600s) for details/photos/reviews. A 429 gets one retry honoring `Retry-After`
-(capped at 10s); 401/403 → "key isn't a valid/authorized Terra key"; 400 →
-surfaces Terra's structured validation `detail` (it names the bad field).
+3600s) for details/photos/reviews. The transport is mcp-utils `createApiClient`
+(30s per-attempt timeout incl. the body read; a 429 gets one retry honoring
+`Retry-After`, capped at 10s, 1s default); 401/403 → "key isn't a
+valid/authorized Terra key" (a CDN/WAF 403 is reported as an edge block
+instead); 400 → surfaces Terra's structured validation `detail` (it names the
+bad field).
 
 Loaded via `loadDotenvSafely` from `.env` next to `dist/` (failure swallowed —
 the .mcpb bundle has no dotenv). The config error is **deferred**: the server
@@ -57,8 +60,9 @@ so the host's install-time `tools/list` probe still succeeds.
 
 ## Layout
 
-- `src/client.ts` — `TripAdvisorClient` (deferred config; custom `get()` with
-  the `X-API-Key` header, two-tier TTL cache, 429 retry, status-specific errors).
+- `src/client.ts` — `TripAdvisorClient` (deferred config; `get()` over a
+  `createApiClient` with `tokenHeader: 'X-API-Key'`, two-tier TTL cache, 429
+  retry, status-specific errors mapped from the typed client errors).
 - `src/tools/shared.ts` — `LocationId`/`Category`/`LocaleList` schemas, the
   shared `pageParams`, and `qs()` (arrays → repeated params, e.g. `locale`).
 - `src/tools/search.ts` — `ta_search_locations`, `ta_search_nearby` (three

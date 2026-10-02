@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { McpToolError } from '@chrischall/mcp-utils';
 import { TripAdvisorClient } from '../src/client.js';
 
 const KEY = 'ta-test-key';
@@ -90,6 +91,145 @@ describe('TripAdvisorClient (Terra)', () => {
     const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch, sleep: async () => {} });
     await expect(c.get('/locations/1')).rejects.toThrow(/quota|rate/i);
     expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
+  // ── Error-message contract, pinned exactly (fleet-audit #1131 moves the
+  //    transport onto mcp-utils createApiClient; these must not drift). ──
+  it('401 and 403 keep the exact Terra-vs-legacy key message and hint', async () => {
+    for (const status of [401, 403]) {
+      const fetchImpl = vi.fn(async () => jsonResponse({ message: 'no' }, status));
+      const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+      const err = await c.get('/locations/1').catch((e) => e);
+      expect(err).toBeInstanceOf(McpToolError);
+      expect(err.message).toBe(
+        `TripAdvisor Terra API returned ${status} — TRIPADVISOR_API_KEY is missing, invalid, or not authorized for Terra. A legacy Content API key does NOT work here (and a Terra key does not work on the legacy endpoint).`,
+      );
+      expect(err.hint).toMatch(/Terra dashboard/);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('a CDN/WAF 403 is reported as an edge block, not as a bad key', async () => {
+    const fetchImpl = vi.fn(async () =>
+      new Response('<html>blocked</html>', { status: 403, headers: { 'cf-mitigated': 'challenge', 'content-type': 'text/html' } }),
+    );
+    const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+    const err = await c.get('/locations/1').catch((e) => e);
+    expect(err).toBeInstanceOf(McpToolError);
+    expect(err.message).toMatch(/Cloudflare/);
+    expect(err.message).not.toMatch(/TRIPADVISOR_API_KEY/);
+  });
+
+  it('400 keeps the exact "rejected the request" message with the validation body', async () => {
+    const body = { detail: 'Parameter is not valid', field_errors: [{ field: 'radius', message: 'required' }] };
+    const fetchImpl = vi.fn(async () => jsonResponse(body, 400));
+    const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+    const err = await c.get('/locations/nearby?lat=1').catch((e) => e);
+    expect(err).toBeInstanceOf(McpToolError);
+    expect(err.message).toBe(`TripAdvisor Terra API rejected the request (400): ${JSON.stringify(body)}`);
+    expect(err.hint).toMatch(/TRIPADVISOR-API\.md/);
+  });
+
+  it('other non-2xx keep the formatApiError shape', async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ message: 'boom' }, 500));
+    const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+    const err = await c.get('/locations/search?query=x').catch((e) => e);
+    expect(err).toBeInstanceOf(McpToolError);
+    expect(err.message).toBe('TripAdvisor Terra API error 500 for GET /locations/search?query=x: {"message":"boom"}');
+    expect(fetchImpl).toHaveBeenCalledTimes(1); // 500 is not retried
+  });
+
+  it('an exhausted 429 keeps the exact quota message', async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({}, 429));
+    const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch, sleep: async () => {} });
+    const err = await c.get('/locations/1').catch((e) => e);
+    expect(err.message).toBe('TripAdvisor Terra API rate limit or daily quota exceeded (429).');
+    expect(err.hint).toMatch(/10,000 calls\/day/);
+  });
+
+  // ── Timing, with fake timers against the real sleep and timeout ──
+  describe('timing (fake timers)', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('waits the Retry-After before the single retry, and no longer', async () => {
+      vi.useFakeTimers();
+      const fetchImpl = vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse({}, 429, { 'retry-after': '4' }))
+        .mockResolvedValueOnce(jsonResponse({ data: [] }));
+      const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+      const pending = c.get('/locations/search?query=x');
+      await vi.advanceTimersByTimeAsync(3_999);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(pending).resolves.toEqual({ data: [] });
+      expect(fetchImpl).toHaveBeenCalledTimes(2);
+    });
+
+    it('caps a huge Retry-After at 10s', async () => {
+      vi.useFakeTimers();
+      const fetchImpl = vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse({}, 429, { 'retry-after': '3600' }))
+        .mockResolvedValueOnce(jsonResponse({ data: [] }));
+      const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+      const pending = c.get('/locations/search?query=x');
+      await vi.advanceTimersByTimeAsync(9_999);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(pending).resolves.toEqual({ data: [] });
+    });
+
+    it('falls back to 1s when Retry-After is absent', async () => {
+      vi.useFakeTimers();
+      const fetchImpl = vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse({}, 429))
+        .mockResolvedValueOnce(jsonResponse({ data: [] }));
+      const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+      const pending = c.get('/locations/search?query=x');
+      await vi.advanceTimersByTimeAsync(999);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(pending).resolves.toEqual({ data: [] });
+    });
+
+    it('times a hung request out at 30s with an actionable McpToolError', async () => {
+      vi.useFakeTimers();
+      const fetchImpl = vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));
+          }),
+      );
+      const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+      const pending = c.get('/locations/1').catch((e) => e);
+      await vi.advanceTimersByTimeAsync(29_999);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      const err = await pending;
+      expect(err).toBeInstanceOf(McpToolError);
+      expect(err.message).toBe('TripAdvisor Terra API request timed out after 30s.');
+    });
+
+    it('gives the retry its own fresh 30s window (bounding the body read too)', async () => {
+      vi.useFakeTimers();
+      let n = 0;
+      const fetchImpl = vi.fn(async () => {
+        n += 1;
+        if (n === 1) return jsonResponse({}, 429, { 'retry-after': '10' });
+        // The retry's body stalls; only its own timeout can end it.
+        return new Response(new ReadableStream<Uint8Array>({ start() {} }), { status: 200 });
+      });
+      const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+      const pending = c.get('/locations/1').catch((e) => e);
+      await vi.advanceTimersByTimeAsync(10_000 + 29_999);
+      expect(fetchImpl).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(1);
+      expect((await pending).message).toMatch(/timed out after 30s/);
+    });
   });
 
   it('caches GET responses within the TTL and refetches after expiry', async () => {
