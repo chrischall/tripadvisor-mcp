@@ -9,7 +9,7 @@
 // generic ({method, path} → {status, body}) — endpoint knowledge lives in the
 // tools, pinned by docs/TRIPADVISOR-WEB-API.md captures.
 
-import { McpToolError } from '@chrischall/mcp-utils';
+import { EdgeBlockedError, McpToolError, detectEdgeBlock } from '@chrischall/mcp-utils';
 import { bridgeErrorInfo, classifyBotWall, type FetchproxyTransport } from '@chrischall/mcp-utils/fetchproxy';
 import { debugLogEnabled } from './config.js';
 import { createTripAdvisorTransport } from './transport.js';
@@ -119,11 +119,21 @@ export class TripAdvisorWebClient {
     return this.getHtml(locationDetailPath(locationId));
   }
 
+  /**
+   * Throw on a bot wall or CDN/WAF refusal page. The shared `detectEdgeBlock`
+   * rule is checked first (it names CloudFront/Akamai/Imperva refusal pages
+   * that `classifyBotWall` does not), and either way the thrown error carries
+   * an `EdgeBlockedError` as `cause`, so `ta_web_healthcheck` reports
+   * `edge_blocked` rather than an unclassified failure (mcp-host#1015).
+   */
   private assertNotWalled(status: number, body: string, path: string): void {
-    const wall = classifyBotWall(body, status);
-    if (wall.blocked) {
-      throw new McpToolError(`tripadvisor.com bot wall (${wall.vendor}) blocked ${path}.`, {
+    const edge = detectEdgeBlock({ body, status });
+    const wall = edge === null ? classifyBotWall(body, status) : undefined;
+    const vendor = edge?.vendor ?? (wall?.blocked ? wall.vendor : undefined);
+    if (vendor !== undefined) {
+      throw new McpToolError(`tripadvisor.com bot wall (${vendor}) blocked ${path}.`, {
         hint: 'Open a www.tripadvisor.com tab in the paired browser, complete any challenge, then retry.',
+        cause: new EdgeBlockedError(status, vendor, { service: 'tripadvisor.com', method: 'GET', path }),
       });
     }
   }
