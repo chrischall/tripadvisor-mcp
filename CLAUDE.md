@@ -17,7 +17,7 @@ attractions/hotels/restaurants). Web-tier shapes are pinned in
 `docs/TRIPADVISOR-WEB-API.md`.
 
 Auth for the primary tier is a Terra key (`TRIPADVISOR_API_KEY`) sent as the
-**`X-API-Key` header**, via a thin custom `fetch` client (not `createApiClient`).
+**`X-API-Key` header**, via mcp-utils `createApiClient` (`tokenHeader: 'X-API-Key'`).
 The key never touches the URL, so cache keys and error messages are key-free by
 construction. A **legacy** Content API key gets a 403 on Terra (and vice-versa);
 that's the tell diagnosed in the 403 error. No writes (Terra has no write
