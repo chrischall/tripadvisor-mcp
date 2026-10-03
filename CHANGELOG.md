@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.1.5](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.4...v1.1.5) (2026-10-03)
+
+
+### Bug Fixes
+
+* **deps:** adopt @chrischall/mcp-utils 2.12.0 createApiClient for the Terra client ([#142](https://github.com/chrischall/tripadvisor-mcp/issues/142)) ([a449b88](https://github.com/chrischall/tripadvisor-mcp/commit/a449b88dd6440d9bf93e124eb98c64b190768e0d))
+* **deps:** bump @chrischall/mcp-utils to 2.13.0 ([#146](https://github.com/chrischall/tripadvisor-mcp/issues/146)) ([a17cbe1](https://github.com/chrischall/tripadvisor-mcp/commit/a17cbe1c897672b4f0dd7cf3d58d3f08d6607bc6))
+* **deps:** bump the production-dependencies group with 2 updates ([#149](https://github.com/chrischall/tripadvisor-mcp/issues/149)) ([e94a327](https://github.com/chrischall/tripadvisor-mcp/commit/e94a32713d253a7d5f797541375650b1e029f6b1))
+* keep credentials and report edge_blocked on CDN/WAF blocks (mcp-utils 2.10.0) ([#140](https://github.com/chrischall/tripadvisor-mcp/issues/140)) ([c5c0362](https://github.com/chrischall/tripadvisor-mcp/commit/c5c036286ebdcfa52f72d320f66fa7efc318ff43))
+* report CDN/WAF blocks as edge_blocked, not a rejected credential (mcp-utils 2.9.0) ([#139](https://github.com/chrischall/tripadvisor-mcp/issues/139)) ([e5a7fa6](https://github.com/chrischall/tripadvisor-mcp/commit/e5a7fa66929afc6223fbb2d1b80dbca055540281))
+* **web:** report a CDN/WAF block in ta_web_healthcheck as edge_blocked ([#145](https://github.com/chrischall/tripadvisor-mcp/issues/145)) ([6b97f57](https://github.com/chrischall/tripadvisor-mcp/commit/6b97f573ecca07cfdf35a93a7d90fdea506b5d5b))
+
+
+### Documentation
+
+* say the Terra client runs on createApiClient in CLAUDE.md ([#144](https://github.com/chrischall/tripadvisor-mcp/issues/144)) ([351def6](https://github.com/chrischall/tripadvisor-mcp/commit/351def6202af0997798c8b2f9fadb110996583bb))
+
 ## [1.1.4](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.3...v1.1.4) (2026-09-27)
 
 
