@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.5...v1.1.6) (2026-10-05)
+
+
+### Bug Fixes
+
+* **deps:** require @chrischall/mcp-utils 2.14.0 and MCP SDK 2.3.0 ([#150](https://github.com/chrischall/tripadvisor-mcp/issues/150)) ([f8846c2](https://github.com/chrischall/tripadvisor-mcp/commit/f8846c22961a64744155e7653a52c198a11c364d))
+
 ## [1.1.5](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.4...v1.1.5) (2026-10-03)
 
 
