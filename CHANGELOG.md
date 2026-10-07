@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.7](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.6...v1.1.7) (2026-10-07)
+
+
+### Bug Fixes
+
+* **deps:** bump mcp-utils to 2.15.0 and fetchproxy to 3.6.0 for elicitation opt-out and safer bridge frames ([#152](https://github.com/chrischall/tripadvisor-mcp/issues/152)) ([3e7464d](https://github.com/chrischall/tripadvisor-mcp/commit/3e7464d80161df6cf6da064691e70ffc2c30c56b))
+* **deps:** bump source-map-js ([#154](https://github.com/chrischall/tripadvisor-mcp/issues/154)) ([d97ce55](https://github.com/chrischall/tripadvisor-mcp/commit/d97ce5545419f6511a1f5d7a599fd9a72be5a6a5))
+
 ## [1.1.6](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.5...v1.1.6) (2026-10-05)
 
 
