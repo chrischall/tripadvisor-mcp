@@ -41,7 +41,7 @@ TRIPADVISOR_CACHE_TTL=<secs>         # Optional. Search read-cache TTL (default 
 TRIPADVISOR_STATIC_CACHE_TTL=<secs>  # Optional. Details/photos/reviews TTL (default 3600; 0 disables)
 TRIPADVISOR_REQUEST_TIMEOUT_MS=<ms>  # Optional. Web-bridge per-request timeout (default 30000)
 TRIPADVISOR_DEBUG_LOG=1              # Optional. Log web-bridge requests to stderr
-TRIPADVISOR_WS_PORT=<port>           # Optional, tests only. Bridge port override (default 37149)
+TRIPADVISOR_WS_PORT=<port>           # Optional, tests only. Bridge port override (default: FETCHPROXY_WS_PORT, else 37149)
 ```
 
 `client.get(path, { cache })` is backed by an in-memory cache keyed by the

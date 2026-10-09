@@ -1,9 +1,39 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createTripAdvisorTransport } from '../../src/web/transport.js';
 import type { FetchproxyServer, FetchproxyServerOpts } from '@chrischall/mcp-utils/fetchproxy';
 
 describe('createTripAdvisorTransport', () => {
-  it('pins the fleet port, domain, and www subdomain', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  function capturePort(): number | undefined {
+    let captured: FetchproxyServerOpts | undefined;
+    createTripAdvisorTransport((opts: FetchproxyServerOpts) => {
+      captured = opts;
+      return { listen: () => {} } as unknown as FetchproxyServer;
+    });
+    return captured!.port;
+  }
+
+  it('leaves the port to fetchproxy (FETCHPROXY_WS_PORT, else 37149) when TRIPADVISOR_WS_PORT is unset', () => {
+    vi.stubEnv('TRIPADVISOR_WS_PORT', undefined);
+    // No explicit port: @fetchproxy/server resolves `opts.port ?? FETCHPROXY_WS_PORT ?? 37149`,
+    // so a fleet-wide FETCHPROXY_WS_PORT move reaches this server too.
+    expect(capturePort()).toBeUndefined();
+  });
+
+  it('passes TRIPADVISOR_WS_PORT through as an explicit port override', () => {
+    vi.stubEnv('TRIPADVISOR_WS_PORT', '40123');
+    expect(capturePort()).toBe(40123);
+  });
+
+  it('ignores an invalid TRIPADVISOR_WS_PORT', () => {
+    vi.stubEnv('TRIPADVISOR_WS_PORT', 'nope');
+    expect(capturePort()).toBeUndefined();
+  });
+
+  it('pins the fleet domain, server name, and fetch capability', () => {
     let captured: FetchproxyServerOpts | undefined;
     const createServer = vi.fn((opts: FetchproxyServerOpts) => {
       captured = opts;
@@ -11,8 +41,6 @@ describe('createTripAdvisorTransport', () => {
     });
     createTripAdvisorTransport(createServer);
     expect(captured).toBeDefined();
-    // The whole fetchproxy fleet shares ONE concentrator port.
-    expect(captured!.port).toBe(37_149);
     expect(captured!.domains).toEqual(['tripadvisor.com']);
     expect(captured!.serverName).toBe('tripadvisor-mcp');
     expect(captured!.capabilities).toContain('fetch');
