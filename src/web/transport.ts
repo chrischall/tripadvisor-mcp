@@ -38,8 +38,10 @@ export type { FetchproxyTransport } from '@chrischall/mcp-utils/fetchproxy';
 export function createTripAdvisorTransport(
   createServer?: (opts: FetchproxyServerOpts) => FetchproxyServer,
 ): FetchproxyTransport {
+  const port = getWsPort();
   return createFetchproxyTransport({
-    port: getWsPort(),
+    // Omitted unless TRIPADVISOR_WS_PORT is set, so FETCHPROXY_WS_PORT applies.
+    ...(port !== undefined ? { port } : {}),
     serverName: 'tripadvisor-mcp',
     version: VERSION,
     // 'tripadvisor.com' matches www.tripadvisor.com (the extension treats each

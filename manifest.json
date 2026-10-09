@@ -34,7 +34,15 @@
         "${__dirname}/dist/bundle.js"
       ],
       "env": {
-        "TRIPADVISOR_API_KEY": "${user_config.tripadvisor_api_key}"
+        "TRIPADVISOR_API_KEY": "${user_config.tripadvisor_api_key}",
+        "TRIPADVISOR_CACHE_TTL": "${user_config.tripadvisor_cache_ttl}",
+        "TRIPADVISOR_STATIC_CACHE_TTL": "${user_config.tripadvisor_static_cache_ttl}",
+        "TRIPADVISOR_REQUEST_TIMEOUT_MS": "${user_config.tripadvisor_request_timeout_ms}",
+        "TRIPADVISOR_DEBUG_LOG": "${user_config.tripadvisor_debug_log}",
+        "TRIPADVISOR_WS_PORT": "${user_config.tripadvisor_ws_port}",
+        "FETCHPROXY_WS_PORT": "${user_config.fetchproxy_ws_port}",
+        "FETCHPROXY_WS_HOST": "${user_config.fetchproxy_ws_host}",
+        "FETCHPROXY_IDENTITY_DIR": "${user_config.fetchproxy_identity_dir}"
       }
     }
   },
@@ -45,6 +53,54 @@
       "description": "Your TripAdvisor Terra API key (create one at tripadvisor.com/developers). Needed by the ta_search_*/ta_get_* Terra tools; ta_web_get_location and ta_web_healthcheck work without it.",
       "required": false,
       "sensitive": true
+    },
+    "tripadvisor_cache_ttl": {
+      "type": "string",
+      "title": "Search cache TTL (optional)",
+      "description": "Seconds to cache search responses (default: 300; `0` disables).",
+      "required": false
+    },
+    "tripadvisor_static_cache_ttl": {
+      "type": "string",
+      "title": "Details cache TTL (optional)",
+      "description": "Seconds to cache details/photos/reviews (default: 3600; `0` disables).",
+      "required": false
+    },
+    "tripadvisor_request_timeout_ms": {
+      "type": "string",
+      "title": "Browser-bridge timeout (optional)",
+      "description": "Per-request timeout for the optional browser bridge (default: 30000).",
+      "required": false
+    },
+    "tripadvisor_debug_log": {
+      "type": "string",
+      "title": "Browser-bridge debug log (optional)",
+      "description": "Set to `1` to log browser-bridge requests to stderr.",
+      "required": false
+    },
+    "tripadvisor_ws_port": {
+      "type": "string",
+      "title": "Bridge port override (optional, tests only)",
+      "description": "Bridge port override (default: FETCHPROXY_WS_PORT, else 37149). Tests only.",
+      "required": false
+    },
+    "fetchproxy_ws_port": {
+      "type": "string",
+      "title": "fetchproxy port (optional, advanced)",
+      "description": "Localhost concentrator port (default 37149). On one machine every MCP shares the concentrator, so move it for ALL of them or not at all.",
+      "required": false
+    },
+    "fetchproxy_ws_host": {
+      "type": "string",
+      "title": "fetchproxy bind host (optional, advanced)",
+      "description": "Bind interface (default 127.0.0.1; a literal IP only, anything else is ignored). Keep on loopback — it exists for ONE topology: a hosted child in its own network namespace.",
+      "required": false
+    },
+    "fetchproxy_identity_dir": {
+      "type": "string",
+      "title": "fetchproxy identity directory (optional, advanced)",
+      "description": "Where to store the long-term identity keypair (default ~/.fetchproxy/identity/; an absolute path only, anything else is ignored). Exists for a host that runs a separate child per caller, so they can share one identity.",
+      "required": false
     }
   },
   "tools": [

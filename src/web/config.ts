@@ -2,12 +2,18 @@ import { parseBoolEnv, readEnvVar, readPortEnv } from '@chrischall/mcp-utils';
 
 // The whole fetchproxy fleet shares ONE concentrator port — the ContextMint
 // Bridge extension dials it, and servers host/peer-elect on it. Never default to a
-// "unique" port; override only for test isolation.
-const DEFAULT_WS_PORT = 37_149;
+// "unique" port. With no override we pass NO port, so @fetchproxy/server resolves
+// it the fleet way (`FETCHPROXY_WS_PORT`, else 37149) and a fleet-wide move of the
+// concentrator reaches this server too.
 
-/** Bridge concentrator port. Override with TRIPADVISOR_WS_PORT (tests only). */
-export function getWsPort(): number {
-  return readPortEnv('TRIPADVISOR_WS_PORT', DEFAULT_WS_PORT);
+/**
+ * Bridge concentrator port override from TRIPADVISOR_WS_PORT (tests only), or
+ * `undefined` to let fetchproxy apply FETCHPROXY_WS_PORT / its 37149 default.
+ */
+export function getWsPort(): number | undefined {
+  // 0 is outside readPortEnv's valid range, so it can only mean "no override".
+  const port = readPortEnv('TRIPADVISOR_WS_PORT', 0);
+  return port === 0 ? undefined : port;
 }
 
 // Comfortably above tripadvisor.com's typical latency but low enough that a
