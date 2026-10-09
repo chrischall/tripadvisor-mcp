@@ -6,8 +6,9 @@ Guidance for Claude working in this repo.
 
 **TripAdvisor Terra API** MCP server, plus an optional browser-bridge tier.
 The primary tier wraps the read-only Terra REST API
-(`https://terra.tripadvisor.com/api`) and exposes 5 tools to Claude over stdio:
-location search, nearby search, location details, photos, and reviews. Terra is
+(`https://terra.tripadvisor.com/api`) and exposes 6 tools to Claude over stdio:
+location search, nearby search, location details, batch location details,
+photos, and reviews. Terra is
 TripAdvisor's current API; the legacy Content API is sunset on 2026-08-31 (an
 earlier build of this repo targeted it — see git history). A second tier
 reaches the bot-walled consumer site via fetchproxy: `ta_web_healthcheck`
