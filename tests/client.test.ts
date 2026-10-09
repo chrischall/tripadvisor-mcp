@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { McpToolError } from '@chrischall/mcp-utils';
+import { McpToolError, UpstreamFormatError } from '@chrischall/mcp-utils';
 import { TripAdvisorClient } from '../src/client.js';
 
 const KEY = 'ta-test-key';
@@ -139,7 +139,7 @@ describe('TripAdvisorClient (Terra)', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1); // 500 is not retried
   });
 
-  it('a non-JSON 2xx (e.g. an HTML maintenance page) is an McpToolError naming the path, not a raw SyntaxError', async () => {
+  it('a non-JSON 2xx (e.g. an HTML maintenance page) is an mcp-utils UpstreamFormatError naming the path, not a raw SyntaxError', async () => {
     const fetchImpl = vi.fn(
       async () =>
         new Response('<html><body>Down for maintenance</body></html>', {
@@ -149,8 +149,8 @@ describe('TripAdvisorClient (Terra)', () => {
     );
     const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
     const err = await c.get('/locations/1').catch((e) => e);
-    expect(err).toBeInstanceOf(McpToolError);
-    expect(err.message).toBe('TripAdvisor Terra API returned a non-JSON success response for GET /locations/1.');
+    expect(err).toBeInstanceOf(UpstreamFormatError);
+    expect(err.message).toBe('TripAdvisor Terra API returned a non-JSON response to GET /locations/1 (HTTP 200, text/html).');
     expect(err.message).not.toContain(KEY);
   });
 
