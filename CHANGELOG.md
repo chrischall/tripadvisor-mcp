@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.8](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.7...v1.1.8) (2026-10-09)
+
+
+### Bug Fixes
+
+* annotate tools truthfully and sync manifests with the served tools ([#160](https://github.com/chrischall/tripadvisor-mcp/issues/160)) ([c906262](https://github.com/chrischall/tripadvisor-mcp/commit/c90626268d8d3d2b36532957f7fe06b030bb0e3e))
+* declare the plugin MCP config under the mcpServers key Claude Code reads ([#161](https://github.com/chrischall/tripadvisor-mcp/issues/161)) ([b8f086b](https://github.com/chrischall/tripadvisor-mcp/commit/b8f086b1242da225f5395033769c3a837444c773))
+* **deps:** update @chrischall/mcp-utils to 3.0.0 ([#159](https://github.com/chrischall/tripadvisor-mcp/issues/159)) ([e8bce16](https://github.com/chrischall/tripadvisor-mcp/commit/e8bce16083305ec792ab4ab76acaef3afa1a8415))
+* resolve low-severity audit findings ([#155](https://github.com/chrischall/tripadvisor-mcp/issues/155)) ([9e155a2](https://github.com/chrischall/tripadvisor-mcp/commit/9e155a2f580cb9d7ab0963b0312006f8293bb77b))
+* treat Cloudflare's JS challenge page as a bot wall ([#158](https://github.com/chrischall/tripadvisor-mcp/issues/158)) ([4a60a8c](https://github.com/chrischall/tripadvisor-mcp/commit/4a60a8c6594e47cdb467846a560a8849aea1bfa9))
+
+
+### Documentation
+
+* correct the Terra tool count in CLAUDE.md ([#157](https://github.com/chrischall/tripadvisor-mcp/issues/157)) ([e5b79a3](https://github.com/chrischall/tripadvisor-mcp/commit/e5b79a3b4745d75e8c67261fa278386c4b5854cb))
+
 ## [1.1.7](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.6...v1.1.7) (2026-10-07)
 
 
