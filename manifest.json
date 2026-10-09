@@ -42,8 +42,8 @@
     "tripadvisor_api_key": {
       "type": "string",
       "title": "TripAdvisor Terra API Key",
-      "description": "Your TripAdvisor Terra API key (create one at tripadvisor.com/developers)",
-      "required": true,
+      "description": "Your TripAdvisor Terra API key (create one at tripadvisor.com/developers). Needed by the ta_search_*/ta_get_* Terra tools; ta_web_get_location and ta_web_healthcheck work without it.",
+      "required": false,
       "sensitive": true
     }
   },

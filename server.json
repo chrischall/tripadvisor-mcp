@@ -18,8 +18,8 @@
       "environmentVariables": [
         {
           "name": "TRIPADVISOR_API_KEY",
-          "description": "Your TripAdvisor Terra API key (tripadvisor.com/developers)",
-          "isRequired": true,
+          "description": "Your TripAdvisor Terra API key (tripadvisor.com/developers). Needed by the Terra tools; the ta_web_* tools work without it.",
+          "isRequired": false,
           "format": "string",
           "isSecret": true
         }
