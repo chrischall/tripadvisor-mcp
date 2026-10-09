@@ -15,7 +15,7 @@ describe('TripAdvisorWebClient', () => {
   it('fetchRaw round-trips through the injected transport', async () => {
     const fetchMock = vi.fn(async () => ({ status: 200, body: 'ok', url: 'https://www.tripadvisor.com/' }));
     const c = new TripAdvisorWebClient({ transport: stubTransport(fetchMock) });
-    const r = await c.fetchRaw('GET', '/');
+    const r = await c.fetchRaw('/');
     expect(r.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledWith({ method: 'GET', path: '/', headers: {} });
   });
@@ -24,7 +24,7 @@ describe('TripAdvisorWebClient', () => {
     const fetchMock = vi.fn(async () => ({ status: 200, body: 'ok', url: '' }));
     const transport = stubTransport(fetchMock);
     const c = new TripAdvisorWebClient({ transport });
-    await Promise.all([c.fetchRaw('GET', '/a'), c.fetchRaw('GET', '/b')]);
+    await Promise.all([c.fetchRaw('/a'), c.fetchRaw('/b')]);
     expect(transport.start).toHaveBeenCalledTimes(1);
   });
 
@@ -34,17 +34,10 @@ describe('TripAdvisorWebClient', () => {
     await expect(c.getHtml('/x')).rejects.toThrow(/answered 500/);
   });
 
-  it('getJson parses a JSON 2xx', async () => {
-    const fetchMock = vi.fn(async () => ({ status: 200, body: '{"results":[1,2]}', url: '' }));
-    const c = new TripAdvisorWebClient({ transport: stubTransport(fetchMock) });
-    const data = await c.getJson<{ results: number[] }>('/data/x');
-    expect(data.results).toEqual([1, 2]);
-  });
-
-  it('getJson flags a non-JSON 2xx as a bot-challenge interstitial', async () => {
-    const fetchMock = vi.fn(async () => ({ status: 200, body: '<html>challenge</html>', url: '' }));
-    const c = new TripAdvisorWebClient({ transport: stubTransport(fetchMock) });
-    await expect(c.getJson('/data/x')).rejects.toThrow(/interstitial/);
+  it('exposes only the GET-HTML surface the tools use (no JSON/POST helpers)', () => {
+    const c = new TripAdvisorWebClient({ transport: stubTransport(vi.fn()) });
+    expect((c as unknown as Record<string, unknown>).getJson).toBeUndefined();
+    expect(c.fetchRaw.length).toBe(1); // path only — GET is implied, no method/body
   });
 
   it('surfaces a DataDome interstitial as a bot-wall error', async () => {
