@@ -97,8 +97,11 @@ export class TripAdvisorWebClient {
   /**
    * Throw on a bot wall or CDN/WAF refusal page. The shared `detectEdgeBlock`
    * rule is checked first (it names CloudFront/Akamai/Imperva refusal pages
-   * that `classifyBotWall` does not), and either way the thrown error carries
-   * an `EdgeBlockedError` as `cause`, so `ta_web_healthcheck` reports
+   * that `classifyBotWall` does not). Both rules recognise Cloudflare's
+   * "Just a moment…" JS challenge at any status, not only the
+   * "Attention Required!" block page (`classifyBotWall` since
+   * @fetchproxy/server 3.6.1, fleet-audit #1182). Either way the thrown error
+   * carries an `EdgeBlockedError` as `cause`, so `ta_web_healthcheck` reports
    * `edge_blocked` rather than an unclassified failure (mcp-host#1015).
    */
   private assertNotWalled(status: number, body: string, path: string): void {

@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import { createTestHarness } from '@chrischall/mcp-utils/test';
-import { webClient } from '../../src/web/client.js';
+import { TripAdvisorWebClient, webClient } from '../../src/web/client.js';
+import {
+  CLOUDFLARE_JS_CHALLENGE_HTML,
+  PAGE_MENTIONING_CHALLENGE_HOST_HTML,
+} from '../fixtures/cloudflare-challenge.js';
 import { registerWebTools } from '../../src/tools/web.js';
 
 const businessHtml = (over: Record<string, unknown> = {}) =>
@@ -68,5 +72,36 @@ describe('ta_web_get_location', () => {
     const text = (result.content[0] as { text: string }).text;
     expect(text).toContain('"name":"Golden Gate Bridge"');
     expect(text).not.toContain('"rating"');
+  });
+
+  // fleet-audit #1182: run the REAL getLocationHtml (bot-wall guard included)
+  // over a stubbed bridge response, so the tool sees what the bridge returns.
+  function serveFromBridge(status: number, body: string) {
+    mockGetLocationHtml.mockImplementationOnce((id: number) =>
+      TripAdvisorWebClient.prototype.getLocationHtml.call(webClient, id),
+    );
+    return vi.spyOn(webClient, 'fetchRaw').mockResolvedValueOnce({ status, body });
+  }
+
+  it('reports a Cloudflare "Just a moment" challenge as a bot wall, not content or a parse failure', async () => {
+    const fetchRaw = serveFromBridge(200, CLOUDFLARE_JS_CHALLENGE_HTML);
+    const result = await harness.callTool('ta_web_get_location', { locationId: 104675 });
+    fetchRaw.mockRestore();
+    expect(result.isError).toBe(true);
+    const text = (result.content[0] as { text: string }).text;
+    expect(text).toMatch(/bot wall \(cloudflare\)/i);
+    expect(text).toMatch(/complete any challenge, then retry/);
+    expect(text).not.toMatch(/could not parse/i);
+  });
+
+  it('does not treat a page that merely mentions challenges.cloudflare.com as a bot wall', async () => {
+    const fetchRaw = serveFromBridge(200, PAGE_MENTIONING_CHALLENGE_HOST_HTML);
+    const result = await harness.callTool('ta_web_get_location', { locationId: 104675 });
+    fetchRaw.mockRestore();
+    // The page reaches the parser (it has no business node, so it's a parse
+    // error) — the point is it was never classified as a wall.
+    const text = (result.content[0] as { text: string }).text;
+    expect(text).not.toMatch(/bot wall/);
+    expect(text).toMatch(/could not parse/i);
   });
 });
