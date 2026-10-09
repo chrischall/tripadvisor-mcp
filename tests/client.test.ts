@@ -139,6 +139,21 @@ describe('TripAdvisorClient (Terra)', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1); // 500 is not retried
   });
 
+  it('a non-JSON 2xx (e.g. an HTML maintenance page) is an McpToolError naming the path, not a raw SyntaxError', async () => {
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response('<html><body>Down for maintenance</body></html>', {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        }),
+    );
+    const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch });
+    const err = await c.get('/locations/1').catch((e) => e);
+    expect(err).toBeInstanceOf(McpToolError);
+    expect(err.message).toBe('TripAdvisor Terra API returned a non-JSON success response for GET /locations/1.');
+    expect(err.message).not.toContain(KEY);
+  });
+
   it('an exhausted 429 keeps the exact quota message', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({}, 429));
     const c = new TripAdvisorClient({ fetchImpl: fetchImpl as unknown as typeof fetch, sleep: async () => {} });
