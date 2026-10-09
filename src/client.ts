@@ -136,6 +136,14 @@ export class TripAdvisorClient {
 
 function mapTerraError(err: unknown, path: string): unknown {
   if (err instanceof McpToolError) return err;
+  // fetchJson JSON.parses a 2xx body unguarded, so an HTML maintenance page or
+  // a truncated body would otherwise escape as a bare SyntaxError.
+  if (err instanceof SyntaxError) {
+    return new McpToolError(`${SERVICE} returned a non-JSON success response for GET ${path}.`, {
+      hint: 'Terra may be serving a maintenance page or a truncated body. Retry shortly.',
+      cause: err,
+    });
+  }
   if (err instanceof RequestTimeoutError) {
     return new McpToolError(`${SERVICE} request timed out after ${REQUEST_TIMEOUT_MS / 1000}s.`, {
       hint: 'Terra was slow to respond. Retry shortly.',

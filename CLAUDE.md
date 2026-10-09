@@ -35,7 +35,7 @@ bridge.
 ## Environment
 
 ```
-TRIPADVISOR_API_KEY=<key>            # Required. A Terra key. Create at https://www.tripadvisor.com/developers
+TRIPADVISOR_API_KEY=<key>            # Required by the Terra tools (ta_web_* work without it). A Terra key. Create at https://www.tripadvisor.com/developers
 TRIPADVISOR_CACHE_TTL=<secs>         # Optional. Search read-cache TTL (default 300; 0 disables)
 TRIPADVISOR_STATIC_CACHE_TTL=<secs>  # Optional. Details/photos/reviews TTL (default 3600; 0 disables)
 TRIPADVISOR_REQUEST_TIMEOUT_MS=<ms>  # Optional. Web-bridge per-request timeout (default 30000)

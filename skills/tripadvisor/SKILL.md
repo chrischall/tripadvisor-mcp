@@ -44,7 +44,7 @@ npm install && npm run build
 
 | Var | Required | Purpose |
 | --- | --- | --- |
-| `TRIPADVISOR_API_KEY` | yes | Terra API key (sent as the `X-API-Key` header). A legacy key returns 403. |
+| `TRIPADVISOR_API_KEY` | for the Terra tools | Terra API key (sent as the `X-API-Key` header). A legacy key returns 403. The `ta_web_*` tools work without it. |
 | `TRIPADVISOR_CACHE_TTL` | no | Seconds to cache identical search responses (default: 300; `0` disables). |
 | `TRIPADVISOR_STATIC_CACHE_TTL` | no | Longer TTL for details/photos/reviews (default: 3600; `0` disables). |
 

@@ -6,7 +6,7 @@
 // same-origin fetches inside the user's open tripadvisor.com tab via the
 // fetchproxy bridge (src/web/transport.ts). The browser carries its own
 // cookies; nothing is captured or persisted here. This client is deliberately
-// generic ({method, path} → {status, body}) — endpoint knowledge lives in the
+// generic (GET path → {status, body}) — endpoint knowledge lives in the
 // tools, pinned by docs/TRIPADVISOR-WEB-API.md captures.
 
 import { EdgeBlockedError, McpToolError, detectEdgeBlock } from '@chrischall/mcp-utils';
@@ -56,22 +56,17 @@ export class TripAdvisorWebClient {
     return transport;
   }
 
-  /** Round-trip one request through the signed-in tab; bridge failures become actionable errors. */
-  async fetchRaw(
-    method: 'GET' | 'POST',
-    path: string,
-    opts: { headers?: Record<string, string>; body?: string } = {},
-  ): Promise<BridgeResult> {
-    if (debugLogEnabled()) console.error(`[tripadvisor-debug] → ${method} ${path}`);
+  /**
+   * GET one path through the signed-in tab; bridge failures become actionable
+   * errors. GET-only by design: no tool needs JSON/POST (search would mean the
+   * brittle persisted-query GraphQL route docs/TRIPADVISOR-WEB-API.md rejects).
+   */
+  async fetchRaw(path: string): Promise<BridgeResult> {
+    if (debugLogEnabled()) console.error(`[tripadvisor-debug] → GET ${path}`);
     let result: BridgeResult;
     try {
       const transport = await this.bridgeReady();
-      result = await transport.fetch({
-        method,
-        path,
-        headers: opts.headers ?? {},
-        ...(opts.body !== undefined ? { body: opts.body } : {}),
-      });
+      result = await transport.fetch({ method: 'GET', path, headers: {} });
     } catch (e) {
       const info = bridgeErrorInfo(e);
       throw new McpToolError(`TripAdvisor bridge: ${info.message}`, {
@@ -84,7 +79,7 @@ export class TripAdvisorWebClient {
 
   /** GET an HTML page. Throws on non-2xx or a bot-wall interstitial. */
   async getHtml(path: string): Promise<string> {
-    const { status, body } = await this.fetchRaw('GET', path);
+    const { status, body } = await this.fetchRaw(path);
     this.assertNotWalled(status, body, path);
     if (status < 200 || status >= 300) {
       throw new McpToolError(`tripadvisor.com answered ${status} for ${path}`, {
@@ -92,26 +87,6 @@ export class TripAdvisorWebClient {
       });
     }
     return body;
-  }
-
-  /** GET a JSON endpoint. A non-JSON 2xx is almost always a bot-challenge interstitial. */
-  async getJson<T = unknown>(path: string, headers: Record<string, string> = {}): Promise<T> {
-    const { status, body } = await this.fetchRaw('GET', path, {
-      headers: { Accept: 'application/json', ...headers },
-    });
-    this.assertNotWalled(status, body, path);
-    if (status < 200 || status >= 300) {
-      throw new McpToolError(`tripadvisor.com answered ${status} for ${path}`, {
-        hint: 'If this persists, run ta_web_healthcheck and make sure a tripadvisor.com tab is open.',
-      });
-    }
-    try {
-      return JSON.parse(body) as T;
-    } catch {
-      throw new McpToolError(`tripadvisor.com answered 2xx but non-JSON for ${path} — likely a bot-challenge interstitial.`, {
-        hint: 'Open (or refresh) a www.tripadvisor.com tab in the paired browser so the challenge clears, then retry.',
-      });
-    }
   }
 
   /** Fetch a location detail page's HTML by numeric d-id (canonicalized by TripAdvisor). */

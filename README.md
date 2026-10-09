@@ -68,7 +68,7 @@ URL) but not individual review text. Request shapes are pinned in
 
 | Var | Required | Purpose |
 | --- | --- | --- |
-| `TRIPADVISOR_API_KEY` | yes | Terra API key, sent as the `X-API-Key` header. |
+| `TRIPADVISOR_API_KEY` | for the Terra tools | Terra API key, sent as the `X-API-Key` header. The `ta_web_*` tools work without it. |
 | `TRIPADVISOR_CACHE_TTL` | no | Seconds to cache search responses (default: 300; `0` disables). |
 | `TRIPADVISOR_STATIC_CACHE_TTL` | no | Seconds to cache details/photos/reviews (default: 3600; `0` disables). |
 | `TRIPADVISOR_REQUEST_TIMEOUT_MS` | no | Per-request timeout for the optional browser bridge (default: 30000). |
