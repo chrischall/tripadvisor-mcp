@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.10](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.9...v1.1.10) (2026-10-16)
+
+
+### Bug Fixes
+
+* **deps:** bump @chrischall/mcp-utils to 3.0.3 and @fetchproxy/server to 3.6.2 ([#168](https://github.com/chrischall/tripadvisor-mcp/issues/168)) ([610f591](https://github.com/chrischall/tripadvisor-mcp/commit/610f591db6b538fc8237138e116fe543dfd19f9e))
+
+
+### Documentation
+
+* **claude:** narrow the first-party bump rule to runtime dependencies ([#166](https://github.com/chrischall/tripadvisor-mcp/issues/166)) ([2fc5f1b](https://github.com/chrischall/tripadvisor-mcp/commit/2fc5f1beb6237f70c3ffc495f7222d0b3b2a1034))
+
 ## [1.1.9](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.8...v1.1.9) (2026-10-10)
 
 
