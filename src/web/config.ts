@@ -1,4 +1,4 @@
-import { parseBoolEnv, readEnvVar, readPortEnv } from '@chrischall/mcp-utils';
+import { parseBoolEnv, readIntEnv, readPortEnv } from '@chrischall/mcp-utils';
 
 // The whole fetchproxy fleet shares ONE concentrator port — the ContextMint
 // Bridge extension dials it, and servers host/peer-elect on it. Never default to a
@@ -22,9 +22,7 @@ const DEFAULT_REQUEST_TIMEOUT_MS = 30_000;
 
 /** Per-request bridge timeout. Override with TRIPADVISOR_REQUEST_TIMEOUT_MS. */
 export function getRequestTimeoutMs(): number {
-  const raw = readEnvVar('TRIPADVISOR_REQUEST_TIMEOUT_MS');
-  const ms = Number(raw);
-  return Number.isFinite(ms) && ms > 0 ? ms : DEFAULT_REQUEST_TIMEOUT_MS;
+  return readIntEnv('TRIPADVISOR_REQUEST_TIMEOUT_MS', { min: 1 }) ?? DEFAULT_REQUEST_TIMEOUT_MS;
 }
 
 /** Per-request bridge debug logging (stderr). Set TRIPADVISOR_DEBUG_LOG=1. */
