@@ -10,7 +10,12 @@
 // tools, pinned by docs/TRIPADVISOR-WEB-API.md captures.
 
 import { EdgeBlockedError, McpToolError, detectEdgeBlock } from '@chrischall/mcp-utils';
-import { bridgeErrorInfo, classifyBotWall, type FetchproxyTransport } from '@chrischall/mcp-utils/fetchproxy';
+import {
+  bridgeErrorInfo,
+  classifyBotWall,
+  createLazyTransport,
+  type FetchproxyTransport,
+} from '@chrischall/mcp-utils/fetchproxy';
 import { debugLogEnabled } from './config.js';
 import { createTripAdvisorTransport } from './transport.js';
 import { locationDetailPath } from './parse.js';
@@ -22,8 +27,15 @@ export interface BridgeResult {
 }
 
 export class TripAdvisorWebClient {
-  private transport: FetchproxyTransport | undefined;
-  private startPromise: Promise<void> | undefined;
+  /**
+   * The bridge transport, built lazily and started once
+   * (`@chrischall/mcp-utils/fetchproxy` `createLazyTransport`,
+   * fleet-audit#1342): concurrent callers share one start, and a rejected
+   * start is forgotten so a transient failure is retried on the next request.
+   */
+  private readonly lazy = createLazyTransport<FetchproxyTransport>(
+    () => this.injected.transport ?? createTripAdvisorTransport(),
+  );
 
   constructor(private readonly injected: { transport?: FetchproxyTransport } = {}) {}
 
@@ -33,27 +45,12 @@ export class TripAdvisorWebClient {
    * probe/report bridge state without re-creating it.
    */
   bridge(): FetchproxyTransport {
-    if (!this.transport) {
-      this.transport = this.injected.transport ?? createTripAdvisorTransport();
-    }
-    return this.transport;
+    return this.lazy.transport();
   }
 
-  /**
-   * The bridge transport, started. Runs single-flight (concurrent callers
-   * share one start) and clears on rejection so a transient failure is retried
-   * on the next request instead of sticking forever.
-   */
-  async bridgeReady(): Promise<FetchproxyTransport> {
-    const transport = this.bridge();
-    if (!this.startPromise) {
-      this.startPromise = transport.start().catch((e: unknown) => {
-        this.startPromise = undefined;
-        throw e;
-      });
-    }
-    await this.startPromise;
-    return transport;
+  /** The bridge transport, started (single-flight; cleared on rejection). */
+  bridgeReady(): Promise<FetchproxyTransport> {
+    return this.lazy.ready();
   }
 
   /**

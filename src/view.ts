@@ -1,4 +1,4 @@
-import { minifiedResult, resolveView, stripMediaUrls, viewParam, type View } from '@chrischall/mcp-utils';
+import { createViewKit, type ViewProjector } from '@chrischall/mcp-utils';
 import { compactList, compactLocationList } from './projection.js';
 
 /**
@@ -43,20 +43,27 @@ const NOTE =
   'compact returns the slim projection where one exists and strips image URLs elsewhere; ' +
   '"full" returns TripAdvisor\'s whole records.';
 
+const kit = createViewKit(TA_VIEWS, { note: NOTE });
+
 /** The `view` parameter every read tool in this server takes. */
-export const viewArg = (): ReturnType<typeof viewParam> => viewParam(TA_VIEWS, { note: NOTE });
+export const viewArg = (): ReturnType<typeof kit.viewArg> => kit.viewArg();
 
 type Projector = 'list' | 'locationList' | undefined;
 
-/** Answer in the requested rung, running the named projection when there is one. */
+const PROJECTORS: Record<Exclude<Projector, undefined>, ViewProjector> = {
+  list: compactList,
+  locationList: compactLocationList,
+};
+
+/**
+ * Answer in the requested rung, running the named projection when there is
+ * one — `@chrischall/mcp-utils`' `createViewKit`, which owns the
+ * projection-is-not-media-stripped rule (fleet-audit#1348).
+ */
 export function viewResponse(
   view: string | undefined,
   data: unknown,
   projector?: Projector,
-): ReturnType<typeof minifiedResult> {
-  const rung: View = resolveView(view, TA_VIEWS);
-  if (rung !== 'compact') return minifiedResult(data);
-  if (projector === 'list') return minifiedResult(compactList(data));
-  if (projector === 'locationList') return minifiedResult(compactLocationList(data));
-  return minifiedResult(stripMediaUrls(data));
+): ReturnType<typeof kit.viewResponse> {
+  return kit.viewResponse(view, data, projector ? PROJECTORS[projector] : undefined);
 }
