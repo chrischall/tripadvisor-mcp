@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.11](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.10...v1.1.11) (2026-10-17)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv ([#171](https://github.com/chrischall/tripadvisor-mcp/issues/171)) ([52596e4](https://github.com/chrischall/tripadvisor-mcp/commit/52596e41241d40f5db8ca233da5b8c88ff87f3a4))
+
 ## [1.1.10](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.9...v1.1.10) (2026-10-16)
 
 
