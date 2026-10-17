@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.12](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.11...v1.1.12) (2026-10-17)
+
+
+### Refactor
+
+* move the view rungs and lazy bridge start onto mcp-utils 3.1 ([#174](https://github.com/chrischall/tripadvisor-mcp/issues/174)) ([66fe5ad](https://github.com/chrischall/tripadvisor-mcp/commit/66fe5ad19f27b66469abc738887fd28d6973afd5))
+
 ## [1.1.11](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.10...v1.1.11) (2026-10-17)
 
 
