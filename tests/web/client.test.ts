@@ -34,6 +34,17 @@ describe('TripAdvisorWebClient', () => {
     expect(transport.start).toHaveBeenCalledTimes(1);
   });
 
+  it('a rejected start() is forgotten, so the next request retries it', async () => {
+    const fetchMock = vi.fn(async () => ({ status: 200, body: 'ok', url: '' }));
+    const transport = stubTransport(fetchMock);
+    (transport.start as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('identity dir unwritable'));
+    const c = new TripAdvisorWebClient({ transport });
+    await expect(c.fetchRaw('/a')).rejects.toThrow(/identity dir unwritable/);
+    await expect(c.fetchRaw('/b')).resolves.toMatchObject({ status: 200 });
+    expect(transport.start).toHaveBeenCalledTimes(2);
+    expect(c.bridge()).toBe(transport);
+  });
+
   it('getHtml throws an actionable error on non-2xx', async () => {
     const fetchMock = vi.fn(async () => ({ status: 500, body: 'oops', url: '' }));
     const c = new TripAdvisorWebClient({ transport: stubTransport(fetchMock) });
