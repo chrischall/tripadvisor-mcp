@@ -61,3 +61,14 @@ egress:
     # there is no direct (bridge-less) mode. The only host the process itself
     # fetches is the Terra API above; the www hostname appears in src only in
     # error hints and returned deep-links.
+examples:
+  - prompt: >-
+      Find the five highest-rated restaurants within a mile of the Louvre in
+      Paris and give me each one's rating, review count and address.
+    note: Uses ta_search_nearby sorted by rating, then ta_get_location_details.
+  - prompt: >-
+      What are recent travelers saying about the Hotel del Coronado? Summarize
+      the most common praise and complaints from its reviews.
+  - prompt: >-
+      Compare the top three attractions in Kyoto by traveler rating and number
+      of reviews, with an address for each.
