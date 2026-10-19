@@ -61,6 +61,7 @@
     "vitest": "^5.0.0"
   },
   "allowScripts": {
-    "esbuild@0.28.1": true
+    "esbuild": false,
+    "fsevents": false
   }
 }
