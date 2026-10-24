@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.13](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.12...v1.1.13) (2026-10-24)
+
+
+### Bug Fixes
+
+* **deps:** bump the production-dependencies group with 2 updates ([#180](https://github.com/chrischall/tripadvisor-mcp/issues/180)) ([c5a3656](https://github.com/chrischall/tripadvisor-mcp/commit/c5a3656b5cc8359d0199cedd70601f5cf6c4dd6e))
+
+
+### Documentation
+
+* **mint:** add sample prompts for the public catalog ([#177](https://github.com/chrischall/tripadvisor-mcp/issues/177)) ([3872c4f](https://github.com/chrischall/tripadvisor-mcp/commit/3872c4f14698574eb6f3014de18fbda0d97dc1c6))
+
 ## [1.1.12](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.11...v1.1.12) (2026-10-17)
 
 
