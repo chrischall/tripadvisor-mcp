@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.13](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.12...v1.1.13) (2026-10-29)
+
+
+### Bug Fixes
+
+* **deps:** bump the production-dependencies group with 2 updates ([#180](https://github.com/chrischall/tripadvisor-mcp/issues/180)) ([c5a3656](https://github.com/chrischall/tripadvisor-mcp/commit/c5a3656b5cc8359d0199cedd70601f5cf6c4dd6e))
+* **deps:** require @chrischall/mcp-utils 3.4.0 ([#181](https://github.com/chrischall/tripadvisor-mcp/issues/181)) ([c3ce426](https://github.com/chrischall/tripadvisor-mcp/commit/c3ce426d06732077f4b5690372fa36b5f1786d9a))
+* **deps:** require the MCP SDK ^2.4.0 that mcp-utils 3.4.0 peer-requires ([#182](https://github.com/chrischall/tripadvisor-mcp/issues/182)) ([608a02f](https://github.com/chrischall/tripadvisor-mcp/commit/608a02fb65f7bffeaff2d73737f06d3348279bfd))
+
+
+### Documentation
+
+* **mint:** add sample prompts for the public catalog ([#177](https://github.com/chrischall/tripadvisor-mcp/issues/177)) ([3872c4f](https://github.com/chrischall/tripadvisor-mcp/commit/3872c4f14698574eb6f3014de18fbda0d97dc1c6))
+
 ## [1.1.12](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.11...v1.1.12) (2026-10-17)
 
 
