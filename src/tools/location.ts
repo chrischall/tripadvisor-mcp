@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BATCH_META, DETAILS_META, PHOTOS_META, REVIEWS_META } from './hints.js';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
@@ -9,6 +10,7 @@ export function registerLocationTools(server: McpServer): void {
   server.registerTool(
     'ta_get_locations',
     {
+      _meta: BATCH_META,
       description:
         'Get details for MULTIPLE locations in one call (batch). Pass an array of location ids — cheaper than repeated ta_get_location_details. Unknown or unlicensed ids are silently omitted. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
@@ -37,6 +39,7 @@ export function registerLocationTools(server: McpServer): void {
   server.registerTool(
     'ta_get_location_details',
     {
+      _meta: DETAILS_META,
       description:
         'Get full details for a TripAdvisor location: names, descriptions, address, coordinates, traveler ratings, ' +
         'phone, category, and listing URLs. Rating-icon and other incidental image URLs are dropped by default; ' +
@@ -65,6 +68,7 @@ export function registerLocationTools(server: McpServer): void {
   server.registerTool(
     'ta_get_location_photos',
     {
+      _meta: PHOTOS_META,
       description: 'Get photos for a TripAdvisor location (multi-size image URLs, source, dimensions), with pagination.',
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({
@@ -90,6 +94,7 @@ export function registerLocationTools(server: McpServer): void {
   server.registerTool(
     'ta_get_location_reviews',
     {
+      _meta: REVIEWS_META,
       description:
         'Get traveler reviews for a TripAdvisor location, with pagination. Reviewer avatars and other image URLs ' +
         'are dropped by default; pass view:"full" for TripAdvisor\'s whole records.',

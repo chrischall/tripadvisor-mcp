@@ -1,5 +1,6 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
+import { DETAILS_META } from './hints.js';
 import { registerBridgeHealthcheckTool } from '@chrischall/mcp-utils/fetchproxy';
 import { EdgeBlockedError, McpToolError, minifiedResult } from '@chrischall/mcp-utils';
 import { webClient } from '../web/client.js';
@@ -51,6 +52,7 @@ export function registerWebTools(server: McpServer): void {
   server.registerTool(
     'ta_web_get_location',
     {
+      _meta: DETAILS_META,
       description:
         "Get a TripAdvisor location's core details (name, rating, review count, address, coordinates, phone, photo, listing URL) by location ID, read from the public page via the browser bridge. Works without an API key — use this when ta_get_location_details is unavailable or its key is blocked. Covers attractions, hotels, and restaurants. Does not return individual review text.",
       annotations: { readOnlyHint: true, openWorldHint: true },

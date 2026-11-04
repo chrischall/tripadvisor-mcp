@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NEARBY_META, SEARCH_META } from './hints.js';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { McpToolError } from '@chrischall/mcp-utils';
 import { client } from '../client.js';
@@ -12,6 +13,7 @@ export function registerSearchTools(server: McpServer): void {
   server.registerTool(
     'ta_search_locations',
     {
+      _meta: SEARCH_META,
       description:
         'Search TripAdvisor locations (restaurants, attractions, hotels) by name. Returns matches with a location id for the detail tools, plus pagination. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
@@ -38,6 +40,7 @@ export function registerSearchTools(server: McpServer): void {
   server.registerTool(
     'ta_search_nearby',
     {
+      _meta: NEARBY_META,
       description:
         'Find TripAdvisor locations near a point within a radius, or inside a bounding box. Center by lat+lon+radius, by a reference location_id+radius, or by a sw/ne bounding box. Returns matches with distance and a location id. Returns slim summaries by default; pass view:"full" for the whole records.',
       annotations: { readOnlyHint: true, openWorldHint: true },
