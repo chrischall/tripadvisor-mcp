@@ -110,3 +110,18 @@ Notes:
 - Everything is **read-only** — Terra has no write endpoints.
 - A `403`/`401` means the key isn't a valid Terra key (a legacy Content API key won't work) or its plan isn't active.
 - List endpoints paginate with `page`/`size` (max 20 per page).
+
+## In context groups
+
+On a host that groups MCPs by context (mcp-host's context groups), this
+server is in the **travel** group. Every tool is a `lookup`: TripAdvisor finds
+places and describes them, and nothing here answers a "what's new / due / on"
+question about the person, so **no tool is a canonical read** and none takes a
+subject. A compound travel ask ("…and what's on my trip, plus any good
+restaurants near the hotel?") reaches this server only for the lookup half —
+`ta_search_locations` / `ta_search_nearby`, then the detail and review tools —
+while the group's canonical reads come from the other travel members.
+
+`ta_web_get_location` is browser-bridged: when no signed-in
+www.tripadvisor.com tab is open, the group answers that this source needs your
+browser open. The Terra API tools need no browser.

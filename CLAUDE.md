@@ -77,6 +77,8 @@ so the host's install-time `tools/list` probe still succeeds.
   **compact by default**) and `viewResponse`, which dispatches a rung to the
   named projector or, where no projection exists, to `stripMediaUrls`.
 - `src/tools/web.ts` — `ta_web_healthcheck`, `ta_web_get_location`.
+- `src/tools/hints.ts` — the `_meta.mint` context-group hints (group `travel`,
+  every tool a `lookup`, none canonical; pinned by `tests/mint-hints.test.ts`).
 - `src/web/{transport,client,config}.ts` — the fetchproxy bridge tier
   (transport on port 37149, generic web client with bot-wall guards, config).
 - `src/web/parse.ts` — pure ld+json → `LocationDetail` projection (unit-tested
