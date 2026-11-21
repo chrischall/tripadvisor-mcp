@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/chrischall/tripadvisor-mcp/compare/v1.2.0...v1.2.1) (2026-11-21)
+
+
+### Bug Fixes
+
+* **deps:** bump @chrischall/mcp-utils ([#191](https://github.com/chrischall/tripadvisor-mcp/issues/191)) ([60e5a05](https://github.com/chrischall/tripadvisor-mcp/commit/60e5a05e74b7e64bd58f2e578ca2c0954e4bdacb))
+* **deps:** bump the production-dependencies group with 3 updates ([#189](https://github.com/chrischall/tripadvisor-mcp/issues/189)) ([db33e68](https://github.com/chrischall/tripadvisor-mcp/commit/db33e68f160ccd9b99b1492cd465bb6fb478fa12))
+
 ## [1.2.0](https://github.com/chrischall/tripadvisor-mcp/compare/v1.1.13...v1.2.0) (2026-11-04)
 
 
